@@ -12,11 +12,11 @@
       <div class="inputs">
         <div class="input">
           <input type="text" placeholder="Email" v-model="email" />
-          <img class="icon" src="@/assets/Icons/envelope-regular.svg" alt="" />
+          <img class="icon" src="../assets/Icons/envelope-regular.svg" alt="" />
         </div>
         <div class="input">
           <input type="password" placeholder="Password" v-model="password" />
-          <img class="icon" src="@/assets/Icons/lock-alt-solid.svg" alt="" />
+          <img class="icon" src="../assets/Icons/lock-alt-solid.svg" alt="" />
         </div>
         <div class="error" v-show="error">{{ errorMsg }}</div>
       </div>
@@ -31,7 +31,8 @@
 </template>
 
 <script lang="ts">
-import firebase from "firebase/app";
+import { auth } from "../firebase/firebaseInit";
+import { signInWithEmailAndPassword, UserCredential } from "firebase/auth";
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -40,16 +41,14 @@ export default defineComponent({
     return {
       email: "",
       password: "",
-      error: null,
+      error: false,
       errorMsg: "",
     };
   },
   methods: {
     signIn() {
-      firebase
-        .auth()
-        .signInWithEmailAndPassword(this.email, this.password)
-        .then(() => {
+      signInWithEmailAndPassword(auth, this.email, this.password)
+        .then((userCredential: UserCredential) => {
           this.$router.push({ name: "Home" });
           this.error = false;
           this.errorMsg = "";

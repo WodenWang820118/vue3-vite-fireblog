@@ -3,7 +3,7 @@
     <div class="blog-cards container">
       <div class="toggle-edit" v-if="admin">
         <span>Toggle Editing Post</span>
-        <input type="checkbox" autocomplete="off" @change="updEditPost" />
+        <input type="checkbox" autocomplete="off" @change="updEditPost(edit)" />
       </div>
       <BlogCards v-for="(card, index) in blogPosts" :card="card" :key="index" />
     </div>
@@ -14,8 +14,8 @@
 import BlogCards from "../components/BlogCards.vue";
 import { useStore } from "vuex";
 import { onBeforeUnmount, computed, ref, onBeforeMount, defineComponent } from "vue";
-import firebase from "firebase/app"; // for using the firebase namespace
-import "firebase/auth"; // for initilize the auth() as a function -> reference: https://stackoverflow.com/questions/48592656/firebase-auth-is-not-a-function
+import { firebaseApp } from "../firebase/firebaseInit";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 export default defineComponent({
   name: "Blogs",
@@ -28,21 +28,21 @@ export default defineComponent({
     const editPost = computed(() => store.getters["posts/editPost"]);
 
     // actions
-    const toggleEditPost = (edit) => {
+    const toggleEditPost = (edit: boolean) => {
       store.dispatch("posts/toggleEditPost", edit);
     };
 
     // varibles
-    const edit = ref(null); // for toggle purpose
+    const edit = ref(false); // for toggle purpose
     const admin = ref(false);
 
     /**
      * According to the state, reassign the local edit boolean to toggle the edit mode
      */
-    function updEditPost(edit) {
-      edit.value = !editPost.value;
-      console.log(edit.value);
-      toggleEditPost(edit.value);
+    function updEditPost(edit: boolean) {
+      edit = !editPost.value;
+      console.log(edit);
+      toggleEditPost(edit);
     }
 
     /**
@@ -51,7 +51,8 @@ export default defineComponent({
     function checkUserState() {
       // offical recommended way to fire the methods after the user state changes
       // otherwise, could be null
-      firebase.auth().onAuthStateChanged((user) => {
+      const auth = getAuth(firebaseApp);
+      onAuthStateChanged(auth, (user) => {
         if (user) {
           // User is signed in, see docs for a list of available properties
           // https://firebase.google.com/docs/reference/js/firebase.User

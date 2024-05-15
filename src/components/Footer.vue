@@ -60,9 +60,9 @@ export default defineComponent({
   name: "FooterVue",
   setup() {
     const store = useStore();
-    // const user = computed(() => store.getters["users/user"]);
+    const user = computed(() => store.getters["users/user"]);
     return {
-      // user,
+      user,
     };
   },
 });

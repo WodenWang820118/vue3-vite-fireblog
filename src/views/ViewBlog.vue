@@ -17,15 +17,16 @@
 </template>
 
 <script lang="ts">
-import Markdown from "vue3-markdown-it";
+// import Markdown from "vue3-markdown-it";
 import { ref, onMounted, defineComponent } from "vue";
 import { useRoute } from "vue-router";
-import db from "../firebase/firebaseInit";
+import { collection, getDocs } from "firebase/firestore";
+import { firestore } from "../firebase/firebaseInit";
 
 export default defineComponent({
   name: "ViewBlog",
   components: {
-    Markdown,
+    // Markdown,
   },
   setup() {
     // varailables defined
@@ -39,20 +40,27 @@ export default defineComponent({
     /**
      * The function get the blog post using the default generaetd blogId by firebase
      */
-    function getCertainPost() {
+    async function getCertainPost() {
       console.log(route.params.blogId);
-      const docRef = db.collection("blogPosts").doc(route.params.blogId);
-      docRef
-        .get()
-        .then((doc) => {
-          doc.exists
-            ? (currentBlog.value = doc.data())
-            : (currentBlog.value = null);
+      const docs = await getDocs(collection(firestore, "blogPosts"));
+      // const docRef = db.collection("blogPosts").doc(route.params.blogId);
+      docs.forEach((doc) => {
+        if (doc.id === route.params.blogId) {
+          currentBlog.value = doc.data();
           src.value = currentBlog.value.blogHTML;
-        })
-        .catch((error) => {
-          console.log("Error getting document:", error);
-        });
+        }
+      });
+      // docRef
+      //   .get()
+      //   .then((doc) => {
+      //     doc.exists
+      //       ? (currentBlog.value = doc.data())
+      //       : (currentBlog.value = null);
+      //     src.value = currentBlog.value.blogHTML;
+      //   })
+      //   .catch((error) => {
+      //     console.log("Error getting document:", error);
+      //   });
     }
 
     onMounted(() => {

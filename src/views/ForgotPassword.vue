@@ -21,7 +21,7 @@
             <input type="text" placeholder="Email" v-model="email" />
             <img
               class="icon"
-              src="@/assets/Icons/envelope-regular.svg"
+              src="../assets/Icons/envelope-regular.svg"
               alt=""
             />
           </div>
@@ -37,7 +37,8 @@
 <script lang="ts">
 import Modal from "../components/Modal.vue";
 import Loading from "../components/Loading.vue";
-import firebase from "firebase/app";
+import { auth } from "../firebase/firebaseInit";
+import { sendPasswordResetEmail } from "firebase/auth";
 import "firebase/auth";
 import { defineComponent } from "vue";
 
@@ -45,10 +46,10 @@ export default defineComponent({
   name: "ForgotPassword",
   data() {
     return {
-      email: null,
-      modalActive: null,
+      email: "",
+      modalActive: false,
       modalMessage: "",
-      loading: null,
+      loading: false,
     };
   },
   components: {
@@ -58,9 +59,7 @@ export default defineComponent({
   methods: {
     resetPassword() {
       this.loading = true;
-      firebase
-        .auth()
-        .sendPasswordResetEmail(this.email)
+        sendPasswordResetEmail(auth, this.email)
         .then(() => {
           this.modalMessage =
             "If your account exists, you will receive a email";

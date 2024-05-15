@@ -67,7 +67,7 @@ export default defineComponent({
   setup() {
     // variables
     const modalMessage = ref("Changes were saved");
-    const modalActive = ref(null);
+    const modalActive = ref(false);
     const wishedFirstName = ref("");
     const wishedLastName = ref("");
     const wishedUsername = ref("");
@@ -75,16 +75,16 @@ export default defineComponent({
     // state management
     const store = useStore();
 
-    const updFirstName = (firstName) => {
-      return store.dispatch("users/updFirstName", firstName);
+    const updFirstName = async(firstName: string) => {
+      return await store.dispatch("users/updFirstName", firstName);
     };
 
-    const updLastName = (lastName) => {
-      return store.dispatch("users/updLastName", lastName);
+    const updLastName = async(lastName: string) => {
+      return await store.dispatch("users/updLastName", lastName);
     };
 
-    const updUsername = (userName) => {
-      return store.dispatch("users/updUsername", userName);
+    const updUsername = async(userName: string) => {
+      return await store.dispatch("users/updUsername", userName);
     };
 
     // functions

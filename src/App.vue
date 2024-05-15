@@ -12,10 +12,10 @@
 <script lang="ts">
 import Navigation from "./components/Navigation.vue";
 import Footer from "./components/Footer.vue";
-import { ref, onMounted, computed, defineComponent } from "vue";
+import { ref, onMounted, computed, defineComponent, Ref } from "vue";
 import { useStore } from 'vuex'
-// import firebase from "firebase/app"; // for using the firebase namespace
-// import "firebase/auth"; // for initilize the auth() as a function -> reference: https://stackoverflow.com/questions/48592656/firebase-auth-is-not-a-function
+import { auth } from "./firebase/firebaseInit";
+import { User } from "firebase/auth";
 export default defineComponent({
   name: "app",
   components: {
@@ -26,17 +26,20 @@ export default defineComponent({
     // composition api, useStore with vuex
     const store = useStore();
     // composition api, use ref
-    const user_login = ref(undefined);
-    const admin = ref(undefined);
+    const user_login: Ref<boolean> = ref(false);
+    const admin: Ref<boolean> = ref(false);
     // dispatched, or committed method from store
     const getCurrentUser = () => {
       return store.dispatch("users/getCurrentUser");
     };
-    const mountUser = (user) => {
+    const mountUser = (user: User | null) => {
+      if (!user) {
+        return;
+      }
       return store.dispatch("users/mountUser", user);
     };
-    const getPost = () => {
-      return store.dispatch("posts/getPost");
+    const getPost = async () => {
+      return await store.dispatch("posts/getPost");
     };
     // the functions used in this view
     /**
@@ -45,25 +48,25 @@ export default defineComponent({
     function checkUserState() {
       // offical recommended way to fire the methods after the user state changes
       // otherwise, could be null
-      // firebase.auth().onAuthStateChanged((user) => {
-      //   if (user) {
-      //     // User is signed in, see docs for a list of available properties
-      //     // https://firebase.google.com/docs/reference/js/firebase.User
-      //     let email = user.email;
-      //     // console.log(`The user email: ${email}`)
-      //     // console.log(`The admin email: ${process.env.VUE_APP_ADMINEMAIL}`)
-      //     email === process.env.VUE_APP_ADMINEMAIL
-      //       ? (admin.value = true)
-      //       : (admin.value = false);
-      //     console.log("The user signed in!");
-      //     user = mountUser(user);
-      //     getCurrentUser();
-      //     user_login.value = true;
-      //   } else {
-      //     user_login.value = false;
-      //     console.log("There is no user using right now");
-      //   }
-      // });
+      auth.onAuthStateChanged(async (user) => {
+        if (user) {
+          // User is signed in, see docs for a list of available properties
+          // https://firebase.google.com/docs/reference/js/firebase.User
+          let email = user.email;
+          // console.log(`The user email: ${email}`)
+          // console.log(`The admin email: ${process.env.VUE_APP_ADMINEMAIL}`)
+          email === process.env.VUE_APP_ADMINEMAIL
+            ? (admin.value = true)
+            : (admin.value = false);
+          console.log("The user signed in!");
+          user = await mountUser(user);
+          getCurrentUser();
+          user_login.value = true;
+        } else {
+          user_login.value = false;
+          console.log("There is no user using right now");
+        }
+      });
     }
     // at setup phase, get the posts before mounting; otherwise, looks slow
     

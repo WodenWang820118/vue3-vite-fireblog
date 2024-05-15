@@ -11,23 +11,23 @@
       <div class="inputs">
         <div class="input">
           <input type="text" placeholder="First Name" v-model="firstName" />
-          <img class="icon" src="@/assets/Icons/user-alt-light.svg" alt="" />
+          <img class="icon" src="../assets/Icons/user-alt-light.svg" alt="" />
         </div>
         <div class="input">
           <input type="text" placeholder="Last Name" v-model="lastName" />
-          <img class="icon" src="@/assets/Icons/user-alt-light.svg" alt="" />
+          <img class="icon" src="../assets/Icons/user-alt-light.svg" alt="" />
         </div>
         <div class="input">
           <input type="text" placeholder="Username" v-model="username" />
-          <img class="icon" src="@/assets/Icons/user-alt-light.svg" alt="" />
+          <img class="icon" src="../assets/Icons/user-alt-light.svg" alt="" />
         </div>
         <div class="input">
           <input type="text" placeholder="Email" v-model="email" />
-          <img class="icon" src="@/assets/Icons/envelope-regular.svg" alt="" />
+          <img class="icon" src="../assets/Icons/envelope-regular.svg" alt="" />
         </div>
         <div class="input">
           <input type="password" placeholder="Password" v-model="password" />
-          <img class="icon" src="@/assets/Icons/lock-alt-solid.svg" alt="" />
+          <img class="icon" src="../assets/Icons/lock-alt-solid.svg" alt="" />
         </div>
         <div class="error" v-show="error">{{ errorMsg }}</div>
       </div>
@@ -39,11 +39,12 @@
 </template>
 
 <script lang="ts">
-import firebase from "firebase/app";
+import { auth, firestore } from "../firebase/firebaseInit";
 import "firebase/firestore";
-import "firebase/auth";
-import db from "../firebase/firebaseInit";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { defineComponent } from "vue";
+import "firebase/firestore";
+import { addDoc, collection, getFirestore } from "firebase/firestore";
 
 export default defineComponent({
   name: "Register",
@@ -54,7 +55,7 @@ export default defineComponent({
       username: "",
       email: "",
       password: "",
-      error: null,
+      error: false,
       errorMsg: "",
     };
   },
@@ -69,18 +70,18 @@ export default defineComponent({
       ) {
         this.error = false;
         this.errorMsg = "";
-        const createUser = await firebase
-          .auth()
-          .createUserWithEmailAndPassword(this.email, this.password);
-        const result = await createUser;
-        const dataBase = db.collection("users").doc(result.user.uid);
+          const userCredential = await createUserWithEmailAndPassword(
+            auth,
+            this.email,
+            this.password
+          );
         // create the schema here
-        await dataBase.set({
+        await addDoc(collection(firestore, `users/${userCredential.user.uid}`), {
           firstName: this.firstName,
           lastName: this.lastName,
           username: this.username,
           email: this.email,
-          uid: result.user.uid,
+          uid: userCredential.user.uid,
         });
         // here changes to this.$router.push to the named route
         this.$router.push({ name: "Home" });

@@ -12,7 +12,7 @@
         <router-link class="link link-light" v-if="post.welcomeScreen" to="#">
           Login/Register<img
             class="arrow-light"
-            src="@/assets/Icons/arrow-right-light.svg"
+            src="../assets/Icons/arrow-right-light.svg"
           />
         </router-link>
         <router-link
@@ -22,7 +22,7 @@
         >
           View The Post<img
             class="arrow"
-            src="@/assets/Icons/arrow-right-light.svg"
+            src="../assets/Icons/arrow-right-light.svg"
           />
         </router-link>
       </div>
@@ -30,7 +30,7 @@
     <div class="blog-photo">
       <img
         v-if="post.welcomeScreen"
-        :src="require(`@/assets/blogPhotos/${post.photo}.jpg`)"
+        :src="`../assets/blogPhotos/${post.photo}.jpg`"
         alt=""
       />
       <img v-else :src="post.blogCoverPhoto" alt="" />
@@ -41,14 +41,25 @@
 <script lang="ts">
 import { computed, defineComponent } from "vue";
 import { useStore } from "vuex";
-import marked from "marked";
+import { marked } from "marked";
+
 export default defineComponent({
   name: "BlogPost",
   props: {
     // more clear about props type, easier for type check and validations
     // https://v3.vuejs.org/guide/component-props.html
     post: {
-      type: Object,
+      type: Object as () => {
+        blogId: string;
+        blogTitle: string;
+        blogPost: string;
+        blogHTML: string;
+        blogCoverPhoto: string;
+        title: string;
+        photo: string;
+        welcomeScreen: boolean;
+      },
+      required: true,
     },
   },
   setup() {
