@@ -51,8 +51,6 @@
 <script lang="ts">
 import BlogCoverPreview from "../components/BlogCoverPreview.vue";
 import Loading from "../components/Loading.vue";
-import firebase from "firebase/app";
-import db from "../firebase/firebaseInit"; // the configuration data
 import "firebase/storage";
 import DOMPurify from "dompurify";
 import { useStore } from "vuex";
