@@ -2,7 +2,7 @@
   <div class="modal" ref="modal">
     <div class="modal-content">
       <img
-        src="../../assets/Icons/times-circle-light.svg"
+        src="../../assets/icons/times-circle-light.svg"
         alt=""
         @click="togglePreview"
         class="icon"
