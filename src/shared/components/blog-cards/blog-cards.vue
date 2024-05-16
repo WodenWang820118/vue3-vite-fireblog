@@ -20,7 +20,7 @@
       </h6>
       <router-link
         class="link"
-        :to="{ name: 'ViewBlog', params: { blogId: card.blogId } }"
+        :to="{ name: 'view-blog', params: { blogId: card.blogId } }"
       >
         View The Post
         <img class="arrow" src="../../assets/Icons/arrow-right-light.svg" />
@@ -34,7 +34,7 @@ import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { computed, defineComponent } from "vue";
 export default defineComponent({
-  name: "BlogCards",
+  name: "blog-cards",
   props: {
     card: {
       type: Object as () => {
@@ -62,7 +62,7 @@ export default defineComponent({
 
     function editBlog() {
       router.push({
-        name: "EditBlog",
+        name: "edit-blog",
         params: {
           blogId: props.card.blogId,
         },

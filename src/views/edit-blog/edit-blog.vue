@@ -1,7 +1,7 @@
 <template>
   <div class="create-post">
-    <BlogCoverPreview v-show="blogPhotoPreview" />
-    <Loading v-show="loading" />
+    <blog-cover-preview v-show="blogPhotoPreview" />
+    <loading v-show="loading" />
     <div class="container">
       <!-- invisible if nothing wrong -->
       <div :class="{ invisible: !error }" class="err-message">
@@ -49,8 +49,8 @@
 </template>
 
 <script lang="ts">
-import BlogCoverPreview from "../../shared/components/blog-cover-preview/BlogCoverPreview.vue";
-import Loading from "../../shared/components/loading/Loading.vue";
+import BlogCoverPreview from "../../shared/components/blog-cover-preview/blog-cover-preview.vue";
+import Loading from "../../shared/components/loading/loading.vue";
 import "firebase/storage";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
@@ -61,10 +61,10 @@ import { collection, DocumentData, getDocs, getFirestore } from "firebase/firest
 import { error } from "console";
 
 export default defineComponent({
-  name: "EditBlog",
+  name: "edit-blog",
   components: {
-    BlogCoverPreview,
-    Loading,
+    'blog-cover-preview':BlogCoverPreview,
+    'loading': Loading,
   },
   setup() {
     // the router reference

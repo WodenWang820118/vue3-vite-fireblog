@@ -1,8 +1,8 @@
 <template>
   <div class="home">
-    <BlogPost v-if="!user" :post="welcomeScreen" />
+    <blog-post v-if="!user" :post="welcomeScreen" />
     <!-- the post props binding the post used in v-for loop -->
-    <BlogPost
+    <blog-post
       :post="post"
       v-for="(post, index) in blogPostsFeed"
       :key="index"
@@ -11,7 +11,7 @@
       <div class="container">
         <h3>View More Recent Blogs</h3>
         <div class="blog-cards">
-          <BlogCards
+          <blog-cards
             v-for="(card, index) in blogPostsCards"
             :card="card"
             :key="index"
@@ -22,7 +22,7 @@
     <div v-if="!user" class="updates">
       <div class="container">
         <h2>Never miss a post. Register for your free account today!</h2>
-        <router-link class="router-button" :to="{ name: 'Register' }">
+        <router-link class="router-button" :to="{ name: 'register' }">
           Register For FireBlogs
           <img class="arrow-light" src="../../assets/Icons/arrow-right-light.svg" />
         </router-link>
@@ -32,15 +32,15 @@
 </template>
 
 <script lang="ts">
-import BlogPost from "./components/BlogPost.vue";
-import BlogCards from "../../shared/components/blog-cards/BlogCards.vue";
+import BlogPost from "./components/blog-post.vue";
+import BlogCards from "../../shared/components/blog-cards/blog-cards.vue";
 import { useStore } from "vuex";
 import { ref, computed, defineComponent } from "vue";
 export default defineComponent({
-  name: "Home",
+  name: "home",
   components: {
-    BlogPost,
-    BlogCards,
+    'blog-post':BlogPost,
+    'blog-cards':BlogCards,
   },
   setup() {
     // state management

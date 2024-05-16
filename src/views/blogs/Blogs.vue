@@ -5,22 +5,22 @@
         <span>Toggle Editing Post</span>
         <input type="checkbox" autocomplete="off" @change="updEditPost(edit)" />
       </div>
-      <BlogCards v-for="(card, index) in blogPosts" :card="card" :key="index" />
+      <blog-cards v-for="(card, index) in blogPosts" :card="card" :key="index" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import BlogCards from "../../shared/components/blog-cards/BlogCards.vue";
+import BlogCards from "../../shared/components/blog-cards/blog-cards.vue";
 import { useStore } from "vuex";
 import { onBeforeUnmount, computed, ref, onBeforeMount, defineComponent } from "vue";
 import { auth } from "../../shared/firebase/firebaseInit";
 import { onAuthStateChanged } from "firebase/auth";
 
 export default defineComponent({
-  name: "Blogs",
+  name: "blogs",
   components: {
-    BlogCards,
+    'blog-cards': BlogCards,
   },
   setup() {
     // state management

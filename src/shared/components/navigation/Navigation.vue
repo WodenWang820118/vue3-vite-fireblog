@@ -2,21 +2,21 @@
   <header>
     <nav class="container">
       <div class="branding">
-        <router-link class="header" :to="{ name: 'Home' }"
+        <router-link class="header" :to="{ name: 'home' }"
           >FireBlogs</router-link
         >
       </div>
       <div class="nav-links">
         <ul v-show="!mobile">
-          <router-link class="link" :to="{ name: 'Home' }">Home</router-link>
-          <router-link class="link" :to="{ name: 'Blogs' }">Blogs</router-link>
+          <router-link class="link" :to="{ name: 'home' }">Home</router-link>
+          <router-link class="link" :to="{ name: 'blogs' }">Blogs</router-link>
           <router-link
             v-if="user_login && admin"
             class="link"
-            :to="{ name: 'CreatePost' }"
+            :to="{ name: 'create-post' }"
             >Create Post
           </router-link>
-          <router-link v-if="!user_login" class="link" :to="{ name: 'Login' }"
+          <router-link v-if="!user_login" class="link" :to="{ name: 'login' }"
             >Login/Register
           </router-link>
         </ul>
@@ -39,7 +39,7 @@
             </div>
             <div class="options">
               <div class="option">
-                <router-link class="option" :to="{ name: 'Profile' }">
+                <router-link class="option" :to="{ name: 'profile' }">
                   <img
                     class="icon"
                     src="../assets/Icons/user-alt-light.svg"
@@ -72,15 +72,15 @@
     />
     <transition name="mobile-nav">
       <ul class="mobile-nav" v-show="mobileNav">
-        <router-link class="link" :to="{ name: 'Home' }">Home</router-link>
-        <router-link class="link" :to="{ name: 'Blogs' }">Blogs</router-link>
+        <router-link class="link" :to="{ name: 'home' }">Home</router-link>
+        <router-link class="link" :to="{ name: 'blogs' }">Blogs</router-link>
         <router-link
           v-if="user_login && admin"
           class="link"
-          :to="{ name: 'CreatePost' }"
+          :to="{ name: 'create-post' }"
           >Create Post</router-link
         >
-        <router-link v-if="!user_login" class="link" :to="{ name: 'Login' }"
+        <router-link v-if="!user_login" class="link" :to="{ name: 'login' }"
           >Login/Register</router-link
         >
       </ul>
@@ -95,7 +95,7 @@ import { auth } from "../../firebase/firebaseInit";
 import { signOut } from "firebase/auth";
 
 export default defineComponent({
-  name: "Navigation",
+  name: "navigation",
   setup() {
     // get the store
     const store = useStore();
@@ -117,7 +117,6 @@ export default defineComponent({
       return;
     }
 
-
     function toggleMobileNav() {
       mobileNav.value = !mobileNav.value;
     }
@@ -129,11 +128,10 @@ export default defineComponent({
     }
 
     async function signUserOut() {
-      await signOut(auth)
-        .then(() => {
-          console.log("The user safely log out");
-          // alert("Hope to see you again")
-        });
+      await signOut(auth).then(() => {
+        // console.log("The user safely log out");
+        // alert("Hope to see you again")
+      });
       window.location.reload();
     }
 

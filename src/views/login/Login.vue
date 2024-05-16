@@ -4,7 +4,7 @@
     <form class="login">
       <p class="login-register">
         Don't have an account?
-        <router-link class="router-link" :to="{ name: 'Register' }"
+        <router-link class="router-link" :to="{ name: 'register' }"
           >Register</router-link
         >
       </p>
@@ -20,7 +20,7 @@
         </div>
         <div class="error" v-show="error">{{ errorMsg }}</div>
       </div>
-      <router-link class="forgot-password" :to="{ name: 'ForgotPassword' }">
+      <router-link class="forgot-password" :to="{ name: 'forgot-password' }">
         Forgot your password?
       </router-link>
       <button @click.prevent="signIn">Sign In</button>
@@ -36,7 +36,7 @@ import { signInWithEmailAndPassword, UserCredential } from "firebase/auth";
 import { defineComponent, ref } from "vue";
 
 export default defineComponent({
-  name: "Login",
+  name: "login",
   setup() {
     const email = ref('');
     const password = ref('');
@@ -54,7 +54,7 @@ export default defineComponent({
     signIn() {
       signInWithEmailAndPassword(auth, this.email, this.password)
         .then((userCredential: UserCredential) => {
-          this.$router.push({ name: "Home" });
+          this.$router.push({ name: "home" });
           this.error = false;
           this.errorMsg = "";
           this.email = "";
