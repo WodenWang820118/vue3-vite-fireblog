@@ -64,7 +64,7 @@ import { useStore } from "vuex";
 import { computed, defineComponent } from "vue";
 
 export default defineComponent({
-  name: "footer",
+  name: "footer-vue",
   setup() {
     const store = useStore();
     const user = computed(() => store.getters["users/user"]);

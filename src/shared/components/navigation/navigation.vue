@@ -90,15 +90,15 @@
 
 <script lang="ts">
 import { useStore } from "vuex";
-import { ref, computed, defineComponent } from "vue";
-import { auth } from "../../firebase/firebaseInit";
-import { signOut } from "firebase/auth";
+import { ref, computed, defineComponent, onMounted } from "vue";
+import { AuthService } from "../../services/auth.service";
 
 export default defineComponent({
   name: "navigation",
   setup() {
     // get the store
     const store = useStore();
+    const authService = new AuthService();
 
     // the variables for adjusting the responsiiveness
     const profileMenu = ref(false);
@@ -127,15 +127,11 @@ export default defineComponent({
       }
     }
 
-    async function signUserOut() {
-      await signOut(auth).then(() => {
-        // console.log("The user safely log out");
-        // alert("Hope to see you again")
-      });
-      window.location.reload();
-    }
+    // window.addEventListener("resize", () => {
+    //   checkScreen();
+    // });
 
-    window.addEventListener("resize", () => {
+    onMounted(() => {
       checkScreen();
     });
 
@@ -154,7 +150,7 @@ export default defineComponent({
       windowWidth,
       toggleProfileMenu,
       toggleMobileNav,
-      signUserOut,
+      signUserOut: authService.signUserOut,
     };
   },
   props: {

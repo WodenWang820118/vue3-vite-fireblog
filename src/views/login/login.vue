@@ -26,7 +26,7 @@
             alt=""
           />
         </div>
-        <div class="error" v-show="error">{{ errorMsg }}</div>
+        <div class="error" v-show="isError">{{ errorMsg }}</div>
       </div>
       <router-link class="forgot-password" :to="{ name: 'forgot-password' }">
         Forgot your password?
@@ -39,41 +39,50 @@
 </template>
 
 <script lang="ts">
-import { auth } from "../../shared/firebase/firebaseInit";
-import { signInWithEmailAndPassword, UserCredential } from "firebase/auth";
 import { defineComponent, ref } from "vue";
+import { AuthService } from "../../shared/services/auth.service";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "login",
   setup() {
     const email = ref("");
     const password = ref("");
-    const error = ref(false);
+    const isError = ref(false);
     const errorMsg = ref("");
+    const router = useRouter();
+    const authService = new AuthService();
+
+    async function signIn() {
+      try {
+        const user = await authService.signInWithEmailAndPassword(
+          email.value,
+          password.value
+        );
+        if (user) {
+          router.push({ name: "home" });
+          isError.value = false;
+          errorMsg.value = "";
+          email.value = "";
+          password.value = "";
+        } else {
+          isError.value = true;
+          errorMsg.value = "Invalid email or password";
+        }
+      } catch (error) {
+        isError.value = true;
+        errorMsg.value = (error as any).message;
+        console.log(errorMsg);
+      }
+    }
 
     return {
       email,
       password,
-      error,
+      isError,
       errorMsg,
+      signIn,
     };
-  },
-  methods: {
-    signIn() {
-      signInWithEmailAndPassword(auth, this.email, this.password)
-        .then((userCredential: UserCredential) => {
-          this.$router.push({ name: "home" });
-          this.error = false;
-          this.errorMsg = "";
-          this.email = "";
-          this.password = "";
-        })
-        .catch((err) => {
-          this.error = true;
-          this.errorMsg = err.message;
-          console.log(this.errorMsg);
-        });
-    },
   },
 });
 </script>

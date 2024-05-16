@@ -49,7 +49,7 @@
             alt=""
           />
         </div>
-        <div class="error" v-show="error">{{ errorMsg }}</div>
+        <div class="error" v-show="isError">{{ errorMsg }}</div>
       </div>
       <button @click.prevent="register">Sign Up</button>
       <div class="angle"></div>
@@ -59,55 +59,65 @@
 </template>
 
 <script lang="ts">
-import { auth, firestore } from "../../shared/firebase/firebaseInit";
+import { firestore } from "../../shared/firebase/firebaseInit";
 import { addDoc, collection } from "firebase/firestore";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
+import { useRouter } from "vue-router";
+import { AuthService } from "../../shared/services/auth.service";
 
 export default defineComponent({
   name: "register",
-  data() {
-    return {
-      firstName: "",
-      lastName: "",
-      username: "",
-      email: "",
-      password: "",
-      error: false,
-      errorMsg: "",
-    };
-  },
-  methods: {
-    async register() {
+  setup() {
+    const firstName = ref("");
+    const lastName = ref("");
+    const username = ref("");
+    const email = ref("");
+    const password = ref("");
+    const isError = ref(false);
+    const errorMsg = ref("");
+    const router = useRouter();
+    const authService = new AuthService();
+
+    async function register() {
       if (
-        this.email !== "" &&
-        this.password !== "" &&
-        this.firstName !== "" &&
-        this.lastName !== "" &&
-        this.username !== ""
+        email.value !== "" &&
+        password.value !== "" &&
+        firstName.value !== "" &&
+        lastName.value !== "" &&
+        username.value !== ""
       ) {
-        this.error = false;
-        this.errorMsg = "";
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          this.email,
-          this.password
+        isError.value = false;
+        errorMsg.value = "";
+        const userCredential = await authService.createUserWithEmailAndPassword(
+          email.value,
+          password.value
         );
         // create the schema here
         await addDoc(collection(firestore, `users`), {
-          firstName: this.firstName,
-          lastName: this.lastName,
-          username: this.username,
-          email: this.email,
+          firstName: firstName,
+          lastName: lastName,
+          username: username,
+          email: email,
           uid: userCredential.user.uid,
         });
-        // here changes to this.$router.push to the named route
-        this.$router.push({ name: "Home" });
+        // here changes to $router.push to the named route
+        router.push({ name: "home" });
         return;
       }
-      this.error = true;
-      this.errorMsg = "Please fill out all the fields";
-    },
+      isError.value = true;
+      errorMsg.value = "Please fill out all the fields";
+    }
+
+    return {
+      firstName,
+      lastName,
+      username,
+      email,
+      password,
+      isError,
+      errorMsg,
+      register,
+    };
   },
 });
 </script>

@@ -24,9 +24,7 @@ import {
   onBeforeMount,
   defineComponent,
 } from "vue";
-import { auth } from "../../shared/firebase/firebaseInit";
-import { onAuthStateChanged } from "firebase/auth";
-
+import { AuthService } from "../../shared/services/auth.service";
 export default defineComponent({
   name: "blogs",
   components: {
@@ -38,32 +36,33 @@ export default defineComponent({
     const editPost = computed(() => store.getters["posts/editPost"]);
 
     // actions
-    const toggleEditPost = (edit: boolean) => {
-      store.dispatch("posts/toggleEditPost", edit);
-    };
+    async function toggleEditPost(edit: boolean) {
+      await store.dispatch("posts/toggleEditPost", edit);
+    }
 
     // varibles
     const edit = ref(false); // for toggle purpose
     const admin = ref(false);
 
-    function updEditPost(edit: boolean) {
+    const authService = new AuthService();
+
+    async function updEditPost(edit: boolean) {
       edit = !editPost.value;
-      toggleEditPost(edit);
+      await toggleEditPost(edit);
     }
 
-    function checkUserState() {
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          let email = user.email;
-          // @ts-ignore
-          email === import.meta.env.VITE_APP_ADMINEMAIL
-            ? (admin.value = true)
-            : (admin.value = false);
-        } else {
-          admin.value = false;
-          console.log("There is no user using right now");
-        }
-      });
+    async function checkUserState() {
+      const currentUser = await authService.checkUserState();
+      if (currentUser) {
+        let email = currentUser.email;
+        //@ts-ignore
+        email === import.meta.env.VITE_APP_ADMINEMAIL
+          ? (admin.value = true)
+          : (admin.value = false);
+        admin.value = true;
+      } else {
+        admin.value = false;
+      }
     }
 
     onBeforeMount(() => {
