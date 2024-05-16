@@ -37,44 +37,47 @@
 <script lang="ts">
 import Modal from "../../shared/components/modal/modal.vue";
 import Loading from "../../shared/components/loading/loading.vue";
-import { auth } from "../../shared/firebase/firebaseInit";
-import { sendPasswordResetEmail } from "firebase/auth";
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
+import { AuthService } from "../../shared/services/auth.service";
 
 export default defineComponent({
   name: "forgot-password",
-  data() {
-    return {
-      email: "",
-      modalActive: false,
-      modalMessage: "",
-      loading: false,
-    };
-  },
   components: {
     modal: Modal,
     loading: Loading,
   },
-  methods: {
-    resetPassword() {
-      this.loading = true;
-      sendPasswordResetEmail(auth, this.email)
-        .then(() => {
-          this.modalMessage =
-            "If your account exists, you will receive a email";
-          this.loading = false;
-          this.modalActive = true; // then pop out the components/Modal.vue
-        })
-        .catch((err) => {
-          this.modalMessage = err.message;
-          this.loading = false;
-          this.modalActive = true;
-        });
-    },
-    closeModal() {
-      this.modalActive = !this.modalActive;
-      this.email = "";
-    },
+  setup() {
+    const email = ref("");
+    const modalActive = ref(false);
+    const modalMessage = ref("");
+    const loading = ref(false);
+    const authService = new AuthService();
+
+    async function resetPassword() {
+      try {
+        loading.value = true;
+        await authService.sendPasswordResetEmail(email.value);
+        modalMessage.value = "If your account exists, you will receive a email";
+        loading.value = false;
+        modalActive.value = true; // then pop out the components/Modal.vue
+      } catch (error) {
+        modalMessage.value = (error as any).message;
+        loading.value = false;
+        modalActive.value = true;
+      }
+    }
+    function closeModal() {
+      modalActive.value = !modalActive.value;
+      email.value = "";
+    }
+    return {
+      email,
+      modalActive,
+      modalMessage,
+      loading,
+      resetPassword,
+      closeModal,
+    };
   },
 });
 </script>
