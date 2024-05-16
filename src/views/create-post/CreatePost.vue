@@ -29,8 +29,8 @@
 
 <script lang="ts">
 // components
-import BlogCoverPreview from "../../shared/components/BlogCoverPreview.vue";
-import Loading from "../../shared/components/Loading.vue";
+import BlogCoverPreview from "../../shared/components/blog-cover-preview/BlogCoverPreview.vue";
+import Loading from "../../shared/components/loading/Loading.vue";
 // vue
 import { ref,  defineComponent, Ref, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
