@@ -50,9 +50,8 @@
 </template>
 
 <script lang="ts">
-import BlogCoverPreview from "../components/BlogCoverPreview.vue";
-import Loading from "../components/Loading.vue";
-import DOMPurify from "dompurify";
+import BlogCoverPreview from "../../shared/components/BlogCoverPreview.vue";
+import Loading from "../../shared/components/Loading.vue";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
 import { ref, computed, defineComponent, Ref } from "vue";
@@ -60,7 +59,7 @@ import imageCompression from "browser-image-compression";
 import { error } from "console";
 import { collection, doc, getDoc, updateDoc } from "firebase/firestore";
 import { ref as storageRef, uploadBytes } from "firebase/storage";
-import { bucket, firestore } from "../firebase/firebaseInit";
+import { bucket, firestore } from "../../shared/firebase/firebaseInit";
 
 export default defineComponent({
   name: "CreatePost",

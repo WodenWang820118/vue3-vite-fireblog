@@ -49,17 +49,17 @@
 </template>
 
 <script lang="ts">
-import BlogCoverPreview from "../components/BlogCoverPreview.vue";
-import Loading from "../components/Loading.vue";
+import BlogCoverPreview from "../../shared/components/BlogCoverPreview.vue";
+import Loading from "../../shared/components/Loading.vue";
 import "firebase/storage";
-import DOMPurify from "dompurify";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
 import { ref, computed, onMounted, defineComponent, Ref } from "vue";
 import imageCompression from "browser-image-compression";
 import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
-import { collection, DocumentData, getDoc, getDocs, getFirestore } from "firebase/firestore";
+import { collection, DocumentData, getDocs, getFirestore } from "firebase/firestore";
 import { error } from "console";
+
 export default defineComponent({
   name: "EditBlog",
   components: {

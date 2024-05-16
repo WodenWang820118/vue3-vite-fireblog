@@ -11,23 +11,23 @@
       <div class="inputs">
         <div class="input">
           <input type="text" placeholder="First Name" v-model="firstName" />
-          <img class="icon" src="../assets/Icons/user-alt-light.svg" alt="" />
+          <img class="icon" src="../../assets/Icons/user-alt-light.svg" alt="" />
         </div>
         <div class="input">
           <input type="text" placeholder="Last Name" v-model="lastName" />
-          <img class="icon" src="../assets/Icons/user-alt-light.svg" alt="" />
+          <img class="icon" src="../../assets/Icons/user-alt-light.svg" alt="" />
         </div>
         <div class="input">
           <input type="text" placeholder="Username" v-model="username" />
-          <img class="icon" src="../assets/Icons/user-alt-light.svg" alt="" />
+          <img class="icon" src="../../assets/Icons/user-alt-light.svg" alt="" />
         </div>
         <div class="input">
           <input type="text" placeholder="Email" v-model="email" />
-          <img class="icon" src="../assets/Icons/envelope-regular.svg" alt="" />
+          <img class="icon" src="../../assets/Icons/envelope-regular.svg" alt="" />
         </div>
         <div class="input">
           <input type="password" placeholder="Password" v-model="password" />
-          <img class="icon" src="../assets/Icons/lock-alt-solid.svg" alt="" />
+          <img class="icon" src="../../assets/Icons/lock-alt-solid.svg" alt="" />
         </div>
         <div class="error" v-show="error">{{ errorMsg }}</div>
       </div>
@@ -39,12 +39,10 @@
 </template>
 
 <script lang="ts">
-import { auth, firestore } from "../firebase/firebaseInit";
-import "firebase/firestore";
+import { auth, firestore } from "../../shared/firebase/firebaseInit";
+import { addDoc, collection } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { defineComponent } from "vue";
-import "firebase/firestore";
-import { addDoc, collection, getFirestore } from "firebase/firestore";
 
 export default defineComponent({
   name: "Register",

@@ -11,11 +11,11 @@
 </template>
 
 <script lang="ts">
-import BlogCards from "../components/BlogCards.vue";
+import BlogCards from "../../shared/components/BlogCards.vue";
 import { useStore } from "vuex";
 import { onBeforeUnmount, computed, ref, onBeforeMount, defineComponent } from "vue";
-import { firebaseApp } from "../firebase/firebaseInit";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../shared/firebase/firebaseInit";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default defineComponent({
   name: "Blogs",
@@ -51,7 +51,6 @@ export default defineComponent({
     function checkUserState() {
       // offical recommended way to fire the methods after the user state changes
       // otherwise, could be null
-      const auth = getAuth(firebaseApp);
       onAuthStateChanged(auth, (user) => {
         if (user) {
           // User is signed in, see docs for a list of available properties

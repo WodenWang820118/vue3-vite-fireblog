@@ -24,7 +24,7 @@
         <h2>Never miss a post. Register for your free account today!</h2>
         <router-link class="router-button" :to="{ name: 'Register' }">
           Register For FireBlogs
-          <img class="arrow-light" src="../assets/Icons/arrow-right-light.svg" />
+          <img class="arrow-light" src="../../assets/Icons/arrow-right-light.svg" />
         </router-link>
       </div>
     </div>
@@ -32,8 +32,8 @@
 </template>
 
 <script lang="ts">
-import BlogPost from "../components/BlogPost.vue";
-import BlogCards from "../components/BlogCards.vue";
+import BlogPost from "./components/BlogPost.vue";
+import BlogCards from "../../shared/components/BlogCards.vue";
 import { useStore } from "vuex";
 import { ref, computed, defineComponent } from "vue";
 export default defineComponent({

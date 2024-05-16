@@ -91,8 +91,8 @@
 <script lang="ts">
 import { useStore } from "vuex";
 import { ref, computed, defineComponent } from "vue";
-import { firebaseApp } from "../firebase/firebaseInit";
-import { getAuth, signOut } from "firebase/auth";
+import { auth } from "../firebase/firebaseInit";
+import { signOut } from "firebase/auth";
 
 export default defineComponent({
   name: "Navigation",
@@ -105,13 +105,8 @@ export default defineComponent({
     const mobile = ref(false); // true ? 'show icon' : '' -> can toggle mobileNav
     const mobileNav = ref(false);
     const windowWidth = ref(window.innerWidth);
-
-    // variable for rendering the profile
     const profile = ref(null);
 
-    /**
-     * Check the the screen width to adjust the responsiiveness layout
-     */
     function checkScreen() {
       if (windowWidth.value <= 750) {
         mobile.value = true; // for toggling mobile responsiveness and navigation
@@ -122,28 +117,18 @@ export default defineComponent({
       return;
     }
 
-    /**
-     * Toggle the boolean value to dynamically adjust the responsiiveness navigation layout
-     */
+
     function toggleMobileNav() {
-      // mobileNav.value = !mobileNav.value;
+      mobileNav.value = !mobileNav.value;
     }
 
-    /**
-     * get the initials of the user with dropdown menu
-     */
     function toggleProfileMenu(e: MouseEvent) {
       if (e.target === profile.value) {
         profileMenu.value = !profileMenu.value;
       }
     }
 
-    /**
-     * Sign out the user and reload the application
-     */
     async function signUserOut() {
-      const auth = getAuth(firebaseApp);
-     
       await signOut(auth)
         .then(() => {
           console.log("The user safely log out");
@@ -168,10 +153,10 @@ export default defineComponent({
       profile,
       mobile,
       mobileNav,
-      windowWidth, // variables
+      windowWidth,
       toggleProfileMenu,
       toggleMobileNav,
-      signUserOut, // functions
+      signUserOut,
     };
   },
   props: {

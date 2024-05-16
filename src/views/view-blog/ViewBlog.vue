@@ -5,66 +5,47 @@
       <h4>
         Posted on:
         {{
-          new Date(currentBlog.blogDate).toLocaleString("en-us", {
-            dateStyle: "long",
-          })
+        new Date(currentBlog.blogDate).toLocaleString("en-us", {
+        dateStyle: "long",
+        })
         }}
       </h4>
       <img class="cover-photo" :src="currentBlog.blogCoverPhoto" alt="" />
-      <Markdown class="post-content ql-editor" :source="src" :html="true" />
+      <VueShowdown :markdown="markdownSrc" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-// import Markdown from "vue3-markdown-it";
 import { ref, onMounted, defineComponent } from "vue";
 import { useRoute } from "vue-router";
-import { collection, getDocs } from "firebase/firestore";
-import { firestore } from "../firebase/firebaseInit";
+import { doc, getDoc } from "firebase/firestore";
+import { firestore } from "../../shared/firebase/firebaseInit";
 
 export default defineComponent({
   name: "ViewBlog",
   components: {
-    // Markdown,
   },
   setup() {
     // varailables defined
     const currentBlog = ref();
     const reload = ref(true);
-    const src = ref();
+    const markdownSrc = ref();
 
     // access router
     const route = useRoute();
 
-    /**
-     * The function get the blog post using the default generaetd blogId by firebase
-     */
-    async function getCertainPost() {
+
+    async function getRoutedPost() {
       console.log(route.params.blogId);
-      const docs = await getDocs(collection(firestore, "blogPosts"));
-      // const docRef = db.collection("blogPosts").doc(route.params.blogId);
-      docs.forEach((doc) => {
-        if (doc.id === route.params.blogId) {
-          currentBlog.value = doc.data();
-          src.value = currentBlog.value.blogHTML;
-        }
-      });
-      // docRef
-      //   .get()
-      //   .then((doc) => {
-      //     doc.exists
-      //       ? (currentBlog.value = doc.data())
-      //       : (currentBlog.value = null);
-      //     src.value = currentBlog.value.blogHTML;
-      //   })
-      //   .catch((error) => {
-      //     console.log("Error getting document:", error);
-      //   });
+      const postDocRef = doc(firestore, "blogPosts", `${route.params.blogId}`);
+      const postDocSnap = await getDoc(postDocRef);
+      currentBlog.value = postDocSnap.data();
+      markdownSrc.value = currentBlog.value.blogHTML;
     }
 
     onMounted(() => {
-      getCertainPost();
+      getRoutedPost();
     });
 
     // cannot return the marked during the setup phase
@@ -72,7 +53,7 @@ export default defineComponent({
     return {
       reload,
       currentBlog,
-      src,
+      markdownSrc,
     };
   },
 });

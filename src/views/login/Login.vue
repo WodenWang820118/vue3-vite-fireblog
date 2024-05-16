@@ -12,11 +12,11 @@
       <div class="inputs">
         <div class="input">
           <input type="text" placeholder="Email" v-model="email" />
-          <img class="icon" src="../assets/Icons/envelope-regular.svg" alt="" />
+          <img class="icon" src="../../assets/Icons/envelope-regular.svg" alt="" />
         </div>
         <div class="input">
           <input type="password" placeholder="Password" v-model="password" />
-          <img class="icon" src="../assets/Icons/lock-alt-solid.svg" alt="" />
+          <img class="icon" src="../../assets/Icons/lock-alt-solid.svg" alt="" />
         </div>
         <div class="error" v-show="error">{{ errorMsg }}</div>
       </div>
@@ -31,18 +31,23 @@
 </template>
 
 <script lang="ts">
-import { auth } from "../firebase/firebaseInit";
+import { auth } from "../../shared/firebase/firebaseInit";
 import { signInWithEmailAndPassword, UserCredential } from "firebase/auth";
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "Login",
-  data() {
+  setup() {
+    const email = ref('');
+    const password = ref('');
+    const error = ref(false);
+    const errorMsg = ref('');
+
     return {
-      email: "",
-      password: "",
-      error: false,
-      errorMsg: "",
+      email,
+      password,
+      error,
+      errorMsg,
     };
   },
   methods: {

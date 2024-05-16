@@ -1,5 +1,12 @@
-import { Function } from "./../../../node_modules/acorn/dist/acorn.d";
-import { CollectionReference, DocumentData, getDocs } from "firebase/firestore";
+import { firestore } from "../../shared/firebase/firebaseInit";
+
+import {
+  collection,
+  deleteDoc,
+  DocumentData,
+  getDocs,
+  QuerySnapshot,
+} from "firebase/firestore";
 
 interface State {
   blogId: string;
@@ -72,33 +79,30 @@ const actions = {
   async togglePreview({ commit }) {
     commit("setPreview");
   },
-  /**
-   * The function connects to the database and bring the data to the array
-   * @param {*} param0
-   * @returns
-   */
-  // accessing the state -> { state }
+
   // @ts-ignore
-  async getPost({ commit, state }) {
-    // // console.log(`The blog posts: ${state.blogPosts}`)
-    // const dataBase = await db
-    //   .collection("blogPosts")
-    //   .orderBy("blogDate", "desc");
-    // const dbResults = await dataBase.get();
-    // // console.log("[Connect and get the blog posts data]");
-    // // console.log(dbResults + "from [blogPosts.js]");
-    // if (dbResults) {
-    //   commit("setPost", dbResults);
-    //   return;
-    // }
-    // console.log("There's something wrong with the database, or empty data");
+  async getPost({ commit }) {
+    // get the blog posts from the firestore
+    // then commit the mutation to set the post
+    const docs = await getDocs(collection(firestore, "blogPosts"));
+    if (docs) {
+      console.log("The blog posts are: ", docs);
+      commit("setPost", docs);
+      return;
+    }
   },
   // @ts-ignore
   async deletePostFromDatabase({ state }, payload: string) {
-    // console.log(`Delete post id: ${payload}`)
-    // const post = await db.collection("blogPosts").doc(payload);
-    // post.delete();
-    // state.blogPosts = state.blogPosts.filter((post) => post.blogId !== payload);
+    const docs = await getDocs(collection(firestore, "blogPosts"));
+    docs.forEach((doc) => {
+      if (doc.data().blogId == payload) {
+        console.log(`Delete post id: ${payload}`);
+        deleteDoc(doc.ref);
+        state.blogPosts = state.blogPosts.filter(
+          (post: any) => post.blogId !== payload
+        );
+      }
+    });
   },
   // @ts-ignore
   getCertainPost({ state }, blogId: string) {
@@ -124,29 +128,20 @@ const mutations = {
   setPreview(state: State) {
     state.blogPhotoPreview = !state.blogPhotoPreview;
   },
-  async setPost(
-    state: State,
-    dbCollection: CollectionReference<DocumentData, DocumentData>
-  ) {
-    // console.log(dbCollection);
-    const docs = await getDocs(dbCollection);
+  async setPost(state: State, docs: QuerySnapshot<unknown, DocumentData>) {
     docs.forEach((doc) => {
-      const data = doc.data();
+      console.log(doc.data());
+      const fields = doc.data() as any;
+      const data = {
+        blogId: fields.blogId,
+        blogHTML: fields.blogHTML,
+        blogCoverPhoto: fields.blogCoverPhoto,
+        blogTitle: fields.blogTitle,
+        blogDate: fields.blogDate,
+        blogCoverPhotoName: fields.blogCoverPhotoName,
+      };
       state.blogPosts.push(data);
-      // console.log(`The updated blog posts: ${state.blogPosts}`);
     });
-    // dbCollection.forEach((doc) => {
-    //   const data = {
-    //     blogId: doc.data().blogId,
-    //     blogHTML: doc.data().blogHTML,
-    //     blogCoverPhoto: doc.data().blogCoverPhoto,
-    //     blogTitle: doc.data().blogTitle,
-    //     blogDate: doc.data().blogDate,
-    //     blogCoverPhotoName: doc.data().blogCoverPhotoName,
-    //   };
-    //   state.blogPosts.push(data);
-    //   // console.log(`The updated blog posts: ${state.blogPosts}`);
-    // });
     state.postLoaded = true;
   },
 };

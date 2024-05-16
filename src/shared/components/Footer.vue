@@ -9,24 +9,24 @@
           <ul>
             <li>
               <a href="#"
-                ><img src="../assets/Icons/youtube-brands.svg" class="svg-icon"
+                ><img src="../../assets/Icons/youtube-brands.svg" class="svg-icon"
               /></a>
             </li>
             <li>
               <a href="#"
-                ><img src="../assets/Icons/twitter-brands.svg" class="svg-icon"
+                ><img src="../../assets/Icons/twitter-brands.svg" class="svg-icon"
               /></a>
             </li>
             <li>
               <a href="#"
                 ><img
-                  src="../assets/Icons/instagram-brands.svg"
+                  src="../../assets/Icons/instagram-brands.svg"
                   class="svg-icon"
               /></a>
             </li>
             <li>
               <a href="#"
-                ><img src="../assets/Icons/linkedin-brands.svg" class="svg-icon"
+                ><img src="../../assets/Icons/linkedin-brands.svg" class="svg-icon"
               /></a>
             </li>
           </ul>
@@ -56,6 +56,7 @@
 <script lang="ts">
 import { useStore } from "vuex";
 import { computed, defineComponent } from "vue";
+
 export default defineComponent({
   name: "FooterVue",
   setup() {

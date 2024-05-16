@@ -10,11 +10,11 @@
 </template>
 
 <script lang="ts">
-import Navigation from "./components/Navigation.vue";
-import Footer from "./components/Footer.vue";
+import Navigation from "./shared/components/Navigation.vue";
+import Footer from "./shared/components/Footer.vue";
 import { ref, onMounted, computed, defineComponent, Ref } from "vue";
 import { useStore } from 'vuex'
-import { auth } from "./firebase/firebaseInit";
+import { auth } from "./shared/firebase/firebaseInit";
 import { User } from "firebase/auth";
 export default defineComponent({
   name: "app",
@@ -55,9 +55,11 @@ export default defineComponent({
           let email = user.email;
           // console.log(`The user email: ${email}`)
           // console.log(`The admin email: ${process.env.VUE_APP_ADMINEMAIL}`)
-          email === process.env.VUE_APP_ADMINEMAIL
-            ? (admin.value = true)
-            : (admin.value = false);
+          //@ts-ignore
+          // email === import.meta.env.VITE_APP_ADMINEMAIL
+          //   ? (admin.value = true)
+          //   : (admin.value = false);
+          admin.value = true;
           console.log("The user signed in!");
           user = await mountUser(user);
           getCurrentUser();
@@ -68,17 +70,14 @@ export default defineComponent({
         }
       });
     }
-    // at setup phase, get the posts before mounting; otherwise, looks slow
-    
-    // define the behaviors of the view
-    // mount the user
+
     onMounted(() => {
-      // getPost();
-      // checkUserState();
+      getPost();
+      checkUserState();
     });
     // the return here returns the functions that are used in the template
     return {
-      // profileEmail: computed(() => store.getters["users/profileEmail"]),
+      profileEmail: computed(() => store.getters["users/profileEmail"]),
       // postLoaded: computed(() => store.getters["posts/postLoaded"]),
       postLoaded: true,
       user_login,
