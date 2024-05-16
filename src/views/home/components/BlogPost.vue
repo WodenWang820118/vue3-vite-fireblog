@@ -12,7 +12,7 @@
         <router-link class="link link-light" v-if="post.welcomeScreen" to="#">
           Login/Register<img
             class="arrow-light"
-            src="../../assets/Icons/arrow-right-light.svg"
+            src="../../../assets/Icons/arrow-right-light.svg"
           />
         </router-link>
         <router-link
@@ -22,7 +22,7 @@
         >
           View The Post<img
             class="arrow"
-            src="../../assets/Icons/arrow-right-light.svg"
+            src="../../../assets/Icons/arrow-right-light.svg"
           />
         </router-link>
       </div>
