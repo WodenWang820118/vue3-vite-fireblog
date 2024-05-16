@@ -92,22 +92,19 @@ const actions = {
     }
   },
   // @ts-ignore
-  async deletePostFromDatabase({ state }, payload: string) {
+  async deletePostFromDatabase({ commit }, payload: string) {
     const docs = await getDocs(collection(firestore, "blogPosts"));
     docs.forEach((doc) => {
       if (doc.data().blogId == payload) {
         console.log(`Delete post id: ${payload}`);
         deleteDoc(doc.ref);
-        state.blogPosts = state.blogPosts.filter(
-          (post: any) => post.blogId !== payload
-        );
+        commit("deletePost", payload);
       }
     });
   },
   // @ts-ignore
-  getCertainPost({ state }, blogId: string) {
-    // console.log(`The current blogPosts: ${state.blogPosts}`)
-    return state.blogPosts.filter((post: any) => post.blogId == blogId);
+  getCertainPost({ commit }, blogId: string) {
+    commit("getCertainPost", blogId);
   },
 };
 
@@ -142,6 +139,14 @@ const mutations = {
       state.blogPosts.push(data);
     });
     state.postLoaded = true;
+  },
+  deletePost(state: State, payload: string) {
+    state.blogPosts = state.blogPosts.filter(
+      (post: any) => post.blogId !== payload
+    );
+  },
+  getCertainPost(state: State, blogId: string) {
+    state.blogPosts.filter((post: any) => post.blogId == blogId);
   },
 };
 
