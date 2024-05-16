@@ -1,40 +1,47 @@
-// import firebase from "firebase/app";
-// import "firebase/auth";
-// import db from "@/firebase/firebaseInit";
+interface User {
+  user: any;
+  profileEmail: string;
+  profileFirstName: string;
+  profileLastName: string;
+  profileUsername: string;
+  profileId: string;
+  profileInitials: string;
+}
 
-const state = {
-  user: null,
-  profileEmail: null,
-  profileFirstName: null,
-  profileLastName: null,
-  profileUsername: null,
-  profileId: null,
-  profileInitials: null,
+const state: User = {
+  user: "",
+  profileEmail: "",
+  profileFirstName: "",
+  profileLastName: "",
+  profileUsername: "",
+  profileId: "",
+  profileInitials: "",
 };
 
 const getters = {
-  user: (state) => state.user,
-  profileEmail(state) {
+  user: (state: User) => state.user,
+  profileEmail(state: User) {
     return state.profileEmail;
   },
-  profileFirstName(state) {
+  profileFirstName(state: User) {
     return state.profileFirstName;
   },
-  profileLastName(state) {
+  profileLastName(state: User) {
     return state.profileLastName;
   },
-  profileUsername(state) {
+  profileUsername(state: User) {
     return state.profileUsername;
   },
-  profileInitials(state) {
+  profileInitials(state: User) {
     return state.profileInitials;
   },
-  profileId(state) {
+  profileId(state: User) {
     return state.profileId;
   },
 };
 
 const actions = {
+  // @ts-ignore
   async getCurrentUser({ commit }) {
     // const dataBase = await db
     //   .collection("users")
@@ -59,12 +66,14 @@ const actions = {
     //     console.log("Error getting document:", error);
     //   });
   },
-  async mountUser({ commit }, user) {
+  // @ts-ignore
+  async mountUser({ commit }, user: User) {
     commit("setUser", user);
   },
   // update the each user file when needed
   // will commit and mutate the state
-  async updFirstName({ commit }, firstName) {
+  // @ts-ignore
+  async updFirstName({ commit }, firstName: string) {
     // console.log("[Retrieve the new first name]: " + firstName);
     // const dataBase = await db.collection("users").doc(state.profileId);
     // await dataBase.update({
@@ -73,7 +82,8 @@ const actions = {
     // console.log("[Successfully update the first name in firestore]");
     // commit("setFirstName", firstName);
   },
-  async updLastName({ commit }, lastName) {
+  // @ts-ignore
+  async updLastName({ commit }, lastName: string) {
     // console.log("[Retrieve the new last name]: " + lastName);
     // const dataBase = await db.collection("users").doc(state.profileId);
     // await dataBase.update({
@@ -82,7 +92,8 @@ const actions = {
     // console.log("[Successfully update the last name in firestore]");
     // commit("setLastName", lastName);
   },
-  async updUsername({ commit }, username) {
+  // @ts-ignore
+  async updUsername({ commit }, username: string) {
     // console.log("[Retrieve the new username]: " + username);
     // const dataBase = await db.collection("users").doc(state.profileId);
     // await dataBase.update({
@@ -94,7 +105,8 @@ const actions = {
 };
 
 const mutations = {
-  setProfileInfo(state, response) {
+  // @ts-ignore
+  setProfileInfo(state: User, response) {
     state.profileId = response.data().uid;
     state.profileEmail = response.data().email;
     state.profileFirstName = response.data().firstName;
@@ -102,7 +114,7 @@ const mutations = {
     state.profileUsername = response.data().username;
   },
   // TODO: the current initials would grab
-  setProfileInitials(state) {
+  setProfileInitials(state: User) {
     // state.profileInitials =
     //   state.profileFirstName.match(/(\b\S)?/g).join("") +
     //   state.profileLastName.match(/(\b\S)?/g).join("")
@@ -110,16 +122,16 @@ const mutations = {
     state.profileInitials =
       state.profileFirstName[0] + state.profileLastName[0];
   },
-  setUser(state, payload) {
+  setUser(state: User, payload: any) {
     state.user = payload;
   },
-  setFirstName(state, payload) {
+  setFirstName(state: User, payload: string) {
     state.profileFirstName = payload;
   },
-  setLastName(state, payload) {
+  setLastName(state: User, payload: string) {
     state.profileLastName = payload;
   },
-  setUsername(state, payload) {
+  setUsername(state: User, payload: string) {
     state.profileUsername = payload;
   },
 };

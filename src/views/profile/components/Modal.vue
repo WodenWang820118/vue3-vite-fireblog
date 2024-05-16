@@ -15,6 +15,7 @@ export default defineComponent({
   props: {
     modalMessage: {
       type: String,
+      required: true,
     },
   },
   methods: {

@@ -1,9 +1,9 @@
 import { createWebHistory, createRouter } from "vue-router";
-import Home from "./views/Home.vue";
-import Login from "./views/Login.vue";
-import ForgotPassword from "./views/ForgotPassword.vue";
-import Register from "./views/Register.vue";
-import Blogs from "./views/Blogs.vue";
+import Home from "./views/home/Home.vue";
+import Login from "./views/login/Login.vue";
+import ForgotPassword from "./views/forgot-password/ForgotPassword.vue";
+import Register from "./views/register/Register.vue";
+import Blogs from "./views/blogs/Blogs.vue";
 
 // identify the routes here, the route could have children routes
 const routes = [
@@ -56,7 +56,7 @@ const routes = [
     path: "/profile",
     name: "Profile",
     props: true,
-    component: () => import("./views/Profile.vue"),
+    component: () => import("./views/profile/Profile.vue"),
     meta: {
       title: "Profile",
     },
@@ -65,7 +65,7 @@ const routes = [
     path: "/create-post",
     name: "CreatePost",
     props: true,
-    component: () => import("./views/CreatePost.vue"),
+    component: () => import("./views/create-post/CreatePost.vue"),
     meta: {
       title: "Create Post",
     },
@@ -74,7 +74,7 @@ const routes = [
     path: "/view-blog/:blogId",
     name: "ViewBlog",
     props: true,
-    component: () => import("./views/ViewBlog.vue"),
+    component: () => import("./views/view-blog/ViewBlog.vue"),
     meta: {
       title: "View Blog",
     },
@@ -83,7 +83,7 @@ const routes = [
     path: "/edit-post/:blogId",
     name: "EditBlog",
     props: true,
-    component: () => import("./views/EditBlog.vue"),
+    component: () => import("./views/edit-blog/EditBlog.vue"),
     meta: {
       title: "Edit Blog Post",
     },

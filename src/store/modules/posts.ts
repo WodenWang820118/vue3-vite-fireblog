@@ -1,118 +1,146 @@
-// import db from "@/firebase/firebaseInit";
+import { firestore } from "../../shared/firebase/firebaseInit";
 
-const state = {
+import {
+  collection,
+  deleteDoc,
+  DocumentData,
+  getDocs,
+  QuerySnapshot,
+} from "firebase/firestore";
+
+interface State {
+  blogId: string;
+  blogHTML: string;
+  blogCoverPhoto: string;
+  blogTitle: string;
+  blogCoverPhotoName: string;
+  blogPhotoFileURL: string;
+  blogPhotoPreview: boolean;
+  blogPosts: Array<any>;
+  postLoaded: boolean;
+  editPost: boolean;
+}
+
+const state: State = {
   // the attributes of a post
   blogHTML: "Write your blog title here...",
   blogTitle: "",
   blogCoverPhotoName: "",
-  blogPhotoFileURL: null,
-  blogPhotoPreview: null,
-  // get the data from firebase storage
+  blogPhotoFileURL: "",
+  blogPhotoPreview: false,
   blogPosts: [],
-  postLoaded: null,
-  editPost: null,
+  postLoaded: false,
+  editPost: false,
+  blogId: "",
+  blogCoverPhoto: "",
 };
 
 const getters = {
-  blogHTML: (state) => state.blogHTML,
-  blogTitle: (state) => state.blogTitle,
-  blogCoverPhotoName: (state) => state.blogCoverPhotoName,
-  blogPhotoFileURL: (state) => state.blogPhotoFileURL,
-  blogPhotoPreview: (state) => state.blogPhotoPreview,
-  blogPostsFeed(state) {
+  blogHTML: (state: State) => state.blogHTML,
+  blogTitle: (state: State) => state.blogTitle,
+  blogCoverPhotoName: (state: State) => state.blogCoverPhotoName,
+  blogPhotoFileURL: (state: State) => state.blogPhotoFileURL,
+  blogPhotoPreview: (state: State) => state.blogPhotoPreview,
+  blogPostsFeed(state: State) {
     return state.blogPosts.slice(0, 2);
   },
-  blogPostsCards(state) {
+  blogPostsCards(state: State) {
     return state.blogPosts.slice(2, 6);
   },
-  blogPosts(state) {
+  blogPosts(state: State) {
     return state.blogPosts;
   },
-  editPost: (state) => state.editPost,
-  postLoaded: (state) => state.postLoaded,
+  editPost: (state: State) => state.editPost,
+  postLoaded: (state: State) => state.postLoaded,
 };
 
 const actions = {
-  toggleEditPost({ commit }, payload) {
+  // @ts-ignore
+  toggleEditPost({ commit }, payload: boolean) {
     commit("setEdit", payload);
   },
-  async updBlogTitle({ commit }, title) {
+  // @ts-ignore
+  async updBlogTitle({ commit }, title: string) {
     commit("setBlogTitle", title);
   },
-  async newBlogPost({ commit }, post) {
+  // @ts-ignore
+  async newBlogPost({ commit }, post: string) {
     commit("setBlog", post);
   },
-  async filenameChange({ commit }, filename) {
+  // @ts-ignore
+  async filenameChange({ commit }, filename: string) {
     commit("setFileName", filename);
   },
-  async createFileURL({ commit }, fileURL) {
+  // @ts-ignore
+  async createFileURL({ commit }, fileURL: string) {
     commit("setFileURL", fileURL);
   },
+  // @ts-ignore
   async togglePreview({ commit }) {
     commit("setPreview");
   },
-  /**
-   * The function connects to the database and bring the data to the array
-   * @param {*} param0
-   * @returns
-   */
-  // accessing the state -> { state }
+
+  // @ts-ignore
   async getPost({ commit }) {
-    // // console.log(`The blog posts: ${state.blogPosts}`)
-    // const dataBase = await db
-    //   .collection("blogPosts")
-    //   .orderBy("blogDate", "desc");
-    // const dbResults = await dataBase.get();
-    // // console.log("[Connect and get the blog posts data]");
-    // // console.log(dbResults + "from [blogPosts.js]");
-    // if (dbResults) {
-    //   commit("setPost", dbResults);
-    //   return;
-    // }
-    // console.log("There's something wrong with the database, or empty data");
+    // get the blog posts from the firestore
+    // then commit the mutation to set the post
+    const docs = await getDocs(collection(firestore, "blogPosts"));
+    if (docs) {
+      console.log("The blog posts are: ", docs);
+      commit("setPost", docs);
+      return;
+    }
   },
-  async deletePostFromDatabase({ state }, payload) {
-    // console.log(`Delete post id: ${payload}`)
-    // const post = await db.collection("blogPosts").doc(payload);
-    // post.delete();
-    // state.blogPosts = state.blogPosts.filter((post) => post.blogId !== payload);
+  // @ts-ignore
+  async deletePostFromDatabase({ state }, payload: string) {
+    const docs = await getDocs(collection(firestore, "blogPosts"));
+    docs.forEach((doc) => {
+      if (doc.data().blogId == payload) {
+        console.log(`Delete post id: ${payload}`);
+        deleteDoc(doc.ref);
+        state.blogPosts = state.blogPosts.filter(
+          (post: any) => post.blogId !== payload
+        );
+      }
+    });
   },
-  getCertainPost({ state }, blogId) {
+  // @ts-ignore
+  getCertainPost({ state }, blogId: string) {
     // console.log(`The current blogPosts: ${state.blogPosts}`)
-    return state.blogPosts.filter((post) => post.blogId == blogId);
+    return state.blogPosts.filter((post: any) => post.blogId == blogId);
   },
 };
 
 const mutations = {
-  setEdit: (state, payload) => (state.editPost = payload),
-  setBlogTitle(state, payload) {
+  setEdit: (state: State, payload: boolean) => (state.editPost = payload),
+  setBlogTitle(state: State, payload: string) {
     state.blogTitle = payload;
   },
-  setBlog(state, payload) {
+  setBlog(state: State, payload: string) {
     state.blogHTML = payload;
   },
-  setFileName(state, payload) {
+  setFileName(state: State, payload: string) {
     state.blogCoverPhotoName = payload;
   },
-  setFileURL(state, payload) {
+  setFileURL(state: State, payload: string) {
     state.blogPhotoFileURL = payload;
   },
-  setPreview(state) {
+  setPreview(state: State) {
     state.blogPhotoPreview = !state.blogPhotoPreview;
   },
-  setPost(state, dbCollection) {
-    // console.log(dbCollection);
-    dbCollection.forEach((doc) => {
+  async setPost(state: State, docs: QuerySnapshot<unknown, DocumentData>) {
+    docs.forEach((doc) => {
+      console.log(doc.data());
+      const fields = doc.data() as any;
       const data = {
-        blogId: doc.data().blogId,
-        blogHTML: doc.data().blogHTML,
-        blogCoverPhoto: doc.data().blogCoverPhoto,
-        blogTitle: doc.data().blogTitle,
-        blogDate: doc.data().blogDate,
-        blogCoverPhotoName: doc.data().blogCoverPhotoName,
+        blogId: fields.blogId,
+        blogHTML: fields.blogHTML,
+        blogCoverPhoto: fields.blogCoverPhoto,
+        blogTitle: fields.blogTitle,
+        blogDate: fields.blogDate,
+        blogCoverPhotoName: fields.blogCoverPhotoName,
       };
       state.blogPosts.push(data);
-      // console.log(`The updated blog posts: ${state.blogPosts}`);
     });
     state.postLoaded = true;
   },

@@ -12,35 +12,16 @@
         <div class="upload-file">
           <label for="blog-photo">Upload Cover Photo</label>
           <!-- the "file" type allows uploading photo -->
-          <input
-            type="file"
-            ref="blogPhoto"
-            id="blog-photo"
-            @change="fileChange"
-            accept=".png, .jpg, .jpeg"
-          />
+          <input type="file" ref="blogPhoto" id="blog-photo" @change="fileChange" accept=".png, .jpg, .jpeg" />
           <!-- disable if not having photo -->
-          <button
-            @click="togglePreview"
-            class="preview"
-            :class="{ 'button-inactive': !blogPhotoFileURL }"
-          >
+          <button @click="togglePreview" class="preview" :class="{ 'button-inactive': !blogPhotoFileURL }">
             Preview Photo
           </button>
           <span v-if="coverPhoto">File Chosen: {{ blogCoverPhotoName }}</span>
         </div>
       </div>
       <div class="editor">
-        <!-- TODO: response rendered box under editor when screen size shrinks -->
-        <!-- tool reference: https://github.com/code-farmer-i/vue-markdown-editor -->
-        <!-- Since instantly preview possible, doesn't need preview post function anymore -->
-        <v-md-editor
-          v-model="text"
-          height="600px"
-          :disabled-menus="[]"
-          @upload-image="imageHandler"
-        >
-        </v-md-editor>
+        <MdEditor v-model="text" @upload-image="imageHandler" />
       </div>
       <div class="blog-actions">
         <button @click="uploadBlog">Publish Blog</button>
@@ -50,22 +31,25 @@
 </template>
 
 <script lang="ts">
-import BlogCoverPreview from "../components/BlogCoverPreview.vue";
-import Loading from "../components/Loading.vue";
-import firebase from "firebase/app";
-import db from "../firebase/firebaseInit"; // the configuration data
-import "firebase/storage";
-import DOMPurify from "dompurify";
+import BlogCoverPreview from "../../shared/components/BlogCoverPreview.vue";
+import Loading from "../../shared/components/Loading.vue";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
-import { ref, computed, defineComponent } from "vue";
+import { ref, computed, defineComponent, Ref } from "vue";
 import imageCompression from "browser-image-compression";
+import { error } from "console";
+import { collection, doc, getDoc, updateDoc } from "firebase/firestore";
+import { ref as storageRef, uploadBytes } from "firebase/storage";
+import { bucket, firestore } from "../../shared/firebase/firebaseInit";
+import { MdEditor } from 'md-editor-v3';
+import 'md-editor-v3/lib/style.css';
 
 export default defineComponent({
   name: "CreatePost",
   components: {
     BlogCoverPreview,
     Loading,
+    MdEditor,
   },
   setup() {
     // state management
@@ -80,15 +64,15 @@ export default defineComponent({
       blogPhotoPreview: computed(() => store.getters["posts/blogPhotoPreview"]),
     };
 
-    const updBlogTitle = (title) => {
+    const updBlogTitle = (title: string) => {
       store.dispatch("posts/updateBlogTitle", title);
     };
 
-    const filenameChange = (filename) => {
+    const filenameChange = (filename: string) => {
       store.dispatch("posts/filenameChange", filename);
     };
 
-    const createFileURL = (file) => {
+    const createFileURL = (file: any) => {
       store.dispatch("posts/createFileURL", file);
     };
 
@@ -106,17 +90,17 @@ export default defineComponent({
     const router = useRouter();
 
     // variables
-    const error = ref(null);
-    const errorMsg = ref(null);
-    const coverPhoto = ref(null);
+    const error = ref(false);
+    const errorMsg = ref("");
+    const coverPhoto: Ref<File | undefined> = ref(undefined as any);
     const blogTitle = ref("");
     const text = ref("");
-    const loading = ref(null);
-    const blogPhoto = ref(null); // ref props in the template
+    const loading = ref(false);
+    const blogPhoto = ref("" as any); // ref props in the template
 
     // functions
 
-    async function imageCompressionHandler(imageFile) {
+    async function imageCompressionHandler(imageFile: any) {
       // options to compress the image
       const options = {
         maxSizeMB: 1,
@@ -148,6 +132,10 @@ export default defineComponent({
         blogPhoto.value.files[0]
       );
       console.log(coverPhoto.value);
+      if (!coverPhoto.value) {
+        return;
+      }
+
       const fileName = coverPhoto.value.name;
       filenameChange(fileName); // change the state
       createFileURL(URL.createObjectURL(coverPhoto.value)); // create the URL
@@ -160,61 +148,66 @@ export default defineComponent({
      * The image handler according to the v-md-editor, which is to upload the image
      * to the firebase
      */
-    async function imageHandler(event, insertImage, files) {
+    async function imageHandler(event: any, insertImage: any, files: File[]) {
       console.log("[Trigger imageHandler]");
       const contentPhoto = await imageCompressionHandler(files[0]);
+      if (!contentPhoto) {
+        return;
+      }
+
       const fileName = contentPhoto.name;
       // const url = URL.createObjectURL(contentPhoto);
-      const storageRef = firebase.storage().ref();
       console.log("[Initialize the firebase stoarge successfully]");
-      const docRef = storageRef.child(`documents/blogPostPhotos/${fileName}`);
-
-      const uploadTask = docRef.put(contentPhoto);
-      uploadTask.on(
-        "stata_changed",
+      const dbRef = doc(firestore, `documents/blogPostPhotos/${fileName}`);
+      const uploadTask = await updateDoc(dbRef, { contentPhoto }).then(
         (snapshot) => {
-          console.log(snapshot); // multiple snapshot -> upload progressing
+          console.log("Uploaded a blob or file!", snapshot);
         },
-        (err) => {
-          console.log(err);
+        (error) => {
+          console.error("Error uploading the file", error);
         },
-        () => {
-          console.log("[Waiting for downloading the image URL]");
-          uploadTask.snapshot.ref.getDownloadURL().then((url) => {
-            console.log("The URL back from firebase:" + url);
-            insertImage({
-              url: url,
-              desc: "desc",
-            });
-          });
-        }
-      );
+      )
+
+      // uploadTask.on(
+      //   "stata_changed",
+      //   (snapshot) => {
+      //     console.log(snapshot); // multiple snapshot -> upload progressing
+      //   },
+      //   (err) => {
+      //     console.log(err);
+      //   },
+      //   () => {
+      //     console.log("[Waiting for downloading the image URL]");
+      //     uploadTask.snapshot.ref.getDownloadURL().then((url) => {
+      //       console.log("The URL back from firebase:" + url);
+      //       insertImage({
+      //         url: url,
+      //         desc: "desc",
+      //       });
+      //     });
+      //   }
+      // );
     }
 
     /**
      * Get the uploaded written blog from the firebase
      */
-    function getWrittenPost() {
-      const docRef = db.collection("blogPosts").doc(route.params.blogId);
-      docRef
-        .get()
-        .then((doc) => {
-          doc.exists
-            ? console.log("Document data:", doc.data())
-            : console.log("No such document!");
-        })
-        .catch((error) => {
-          console.log("Error getting document:", error);
-        });
+    async function getWrittenPost() {
+      const collectionRef = collection(firestore, "blogPosts");
+      const docRef = doc(collectionRef, `${route.params.blogId}`);
+      await getDoc(docRef).then((doc) => {
+        if (doc.exists()) {
+          console.log("Document data:", doc.data());
+        } else {
+          console.log("No such document!");
+        }
+      });
     }
 
     /**
      * Upload the blog post to the firebase
      */
     function uploadBlog() {
-      if (db) {
-        console.log("database alive");
-      }
       if (blogTitle.value.length !== 0 && text.value.length !== 0) {
         if (coverPhoto.value) {
           loading.value = true;
@@ -222,60 +215,63 @@ export default defineComponent({
           const timestamp = Date.now();
           const fileName = coverPhoto.value.name;
           const uniqueFileName = fileName + timestamp;
-          const storageRef = firebase.storage().ref();
-          const docRef = storageRef.child(
-            `documents/BlogCoverPhotos/${uniqueFileName}`
-          );
+          const bucketRef = storageRef(bucket, `documents/BlogCoverPhotos/${uniqueFileName}`);
 
-          const uploadTask = docRef.put(coverPhoto.value);
-          // watch the upload task according to the progress
-          uploadTask.on(
-            "state_changed",
-            (snapshot) => {
-              var progress =
-                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              console.log("Upload is " + progress + "% done");
-              switch (snapshot.state) {
-                case firebase.storage.TaskState.PAUSED: // or 'paused'
-                  console.log("Upload is paused");
-                  break;
-                case firebase.storage.TaskState.RUNNING: // or 'running'
-                  console.log("Upload is running");
-                  break;
-              }
-            },
-            (err) => {
-              console.log(err);
-              loading.value = false;
-            },
-            async () => {
-              const timestamp = Date.now();
-              const document = db.collection("blogPosts").doc(); // auto-generate the document path
-              uploadTask.snapshot.ref.getDownloadURL().then((url) => {
-                console.log("The URL back from firebase:" + url);
-                console.log("The database id: " + document.id);
-                // set the schema
-                document.set({
-                  blogId: document.id, // the blogID is also used as path
-                  blogHTML: DOMPurify.sanitize(text.value),
-                  blogCoverPhoto: url,
-                  blogCoverPhotoName: uniqueFileName,
-                  blogTitle: blogTitle.value,
-                  profileId: profileId.value,
-                  blogDate: timestamp,
-                });
-              });
-              loading.value = true;
-              console.log("[Route to the new post]");
-              getWrittenPost();
-              loading.value = false;
-              await router.push({
-                name: "ViewBlog",
-                params: { blogId: document.id },
-              });
+          uploadBytes(bucketRef, coverPhoto.value).then((snapshot) => {
+            console.log("Uploaded a blob or file!", snapshot);
+            if (snapshot) {
+              console.log("The file has been uploaded successfully");
             }
-          );
-          return;
+          });
+
+          // watch the upload task according to the progress
+        //   uploadTask.on(
+        //     "state_changed",
+        //     (snapshot) => {
+        //       var progress =
+        //         (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        //       console.log("Upload is " + progress + "% done");
+        //       switch (snapshot.state) {
+        //         case firebase.storage.TaskState.PAUSED: // or 'paused'
+        //           console.log("Upload is paused");
+        //           break;
+        //         case firebase.storage.TaskState.RUNNING: // or 'running'
+        //           console.log("Upload is running");
+        //           break;
+        //       }
+        //     },
+        //     (err) => {
+        //       console.log(err);
+        //       loading.value = false;
+        //     },
+        //     async () => {
+        //       const timestamp = Date.now();
+        //       const document = db.collection("blogPosts").doc(); // auto-generate the document path
+        //       uploadTask.snapshot.ref.getDownloadURL().then((url) => {
+        //         console.log("The URL back from firebase:" + url);
+        //         console.log("The database id: " + document.id);
+        //         // set the schema
+        //         document.set({
+        //           blogId: document.id, // the blogID is also used as path
+        //           blogHTML: DOMPurify.sanitize(text.value),
+        //           blogCoverPhoto: url,
+        //           blogCoverPhotoName: uniqueFileName,
+        //           blogTitle: blogTitle.value,
+        //           profileId: profileId.value,
+        //           blogDate: timestamp,
+        //         });
+        //       });
+        //       loading.value = true;
+        //       console.log("[Route to the new post]");
+        //       getWrittenPost();
+        //       loading.value = false;
+        //       await router.push({
+        //         name: "ViewBlog",
+        //         params: { blogId: document.id },
+        //       });
+        //     }
+        //   );
+        //   return;
         }
         error.value = true;
         errorMsg.value = "Please ensure you uploaded a cover photo";
@@ -306,7 +302,7 @@ export default defineComponent({
       loading,
       blogPhoto,
     };
-  },
+  }
 });
 </script>
 

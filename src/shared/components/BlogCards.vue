@@ -3,10 +3,10 @@
     <div v-show="editPost" class="icons">
       <div @click="editBlog" class="icon">
         <!-- the image has its own container, that's why the it's not centered -->
-        <img class="edit" src="@/assets/Icons/edit-regular.svg" alt="" />
+        <img class="edit" src="../../assets/Icons/edit-regular.svg" alt="" />
       </div>
       <div @click="deletePost" class="icon">
-        <img class="delete" src="@/assets/Icons/trash-regular.svg" alt="" />
+        <img class="delete" src="../../assets/Icons/trash-regular.svg" alt="" />
       </div>
     </div>
     <img class="image" :src="card.blogCoverPhoto" alt="" />
@@ -23,7 +23,7 @@
         :to="{ name: 'ViewBlog', params: { blogId: card.blogId } }"
       >
         View The Post
-        <img class="arrow" src="@/assets/Icons/arrow-right-light.svg" />
+        <img class="arrow" src="../../assets/Icons/arrow-right-light.svg" />
       </router-link>
     </div>
   </div>
@@ -37,7 +37,15 @@ export default defineComponent({
   name: "BlogCards",
   props: {
     card: {
-      type: Object,
+      type: Object as () => {
+        blogId: string;
+        blogTitle: string;
+        blogPost: string;
+        blogHTML: string;
+        blogCoverPhoto: string;
+        blogDate: string;
+      },
+      required: true,
     },
   },
   setup(props) {
@@ -45,7 +53,7 @@ export default defineComponent({
     const store = useStore();
 
     // actions
-    const deletePostFromDatabase = (id) => {
+    const deletePostFromDatabase = (id: string) => {
       return store.dispatch("posts/deletePostFromDatabase", id);
     };
 
