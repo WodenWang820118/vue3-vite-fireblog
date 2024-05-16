@@ -35,13 +35,17 @@ export default defineComponent({
     // access router
     const route = useRoute();
 
-
     async function getRoutedPost() {
       console.log(route.params.blogId);
       const postDocRef = doc(firestore, "blogPosts", `${route.params.blogId}`);
       const postDocSnap = await getDoc(postDocRef);
-      currentBlog.value = postDocSnap.data();
-      markdownSrc.value = currentBlog.value.blogHTML;
+      if (!postDocSnap.exists()) {
+        console.log("No such document!");
+      } else {
+        console.log("Document data:", postDocSnap.data());
+        currentBlog.value = postDocSnap.data();
+        markdownSrc.value = currentBlog.value.blogHTML;
+      }
     }
 
     onMounted(() => {
