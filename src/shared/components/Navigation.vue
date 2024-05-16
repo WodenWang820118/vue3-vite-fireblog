@@ -48,7 +48,7 @@
                   <p>Profile</p>
                 </router-link>
               </div>
-              <div @click="signOut" class="option">
+              <div @click="signUserOut" class="option">
                 <img
                   class="icon"
                   src="../assets/Icons/sign-out-alt-regular.svg"
@@ -91,8 +91,9 @@
 <script lang="ts">
 import { useStore } from "vuex";
 import { ref, computed, defineComponent } from "vue";
-// import firebase from "firebase/app"; // for using the firebase namespace
-// import "firebase/auth"; // for initilize the auth() as a function -> reference: https://stackoverflow.com/questions/48592656/firebase-auth-is-not-a-function
+import { auth } from "../firebase/firebaseInit";
+import { signOut } from "firebase/auth";
+
 export default defineComponent({
   name: "Navigation",
   setup() {
@@ -101,55 +102,40 @@ export default defineComponent({
 
     // the variables for adjusting the responsiiveness
     const profileMenu = ref(false);
-    const mobile = ref(null); // true ? 'show icon' : '' -> can toggle mobileNav
-    const mobileNav = ref(null);
+    const mobile = ref(false); // true ? 'show icon' : '' -> can toggle mobileNav
+    const mobileNav = ref(false);
     const windowWidth = ref(window.innerWidth);
-
-    // variable for rendering the profile
     const profile = ref(null);
 
-    /**
-     * Check the the screen width to adjust the responsiiveness layout
-     */
     function checkScreen() {
-      // if (windowWidth.value <= 750) {
-      //   mobile.value = true; // for toggling mobile responsiveness and navigation
-      //   return;
-      // }
-      // mobile.value = false;
-      // mobileNav.value = false;
-      // return;
+      if (windowWidth.value <= 750) {
+        mobile.value = true; // for toggling mobile responsiveness and navigation
+        return;
+      }
+      mobile.value = false;
+      mobileNav.value = false;
+      return;
     }
 
-    /**
-     * Toggle the boolean value to dynamically adjust the responsiiveness navigation layout
-     */
+
     function toggleMobileNav() {
-      // mobileNav.value = !mobileNav.value;
+      mobileNav.value = !mobileNav.value;
     }
 
-    /**
-     * get the initials of the user with dropdown menu
-     */
-    function toggleProfileMenu(e) {
+    function toggleProfileMenu(e: MouseEvent) {
       if (e.target === profile.value) {
         profileMenu.value = !profileMenu.value;
       }
     }
 
-    /**
-     * Sign out the user and reload the application
-     */
-    // function signOut() {
-    //   firebase
-    //     .auth()
-    //     .signOut()
-    //     .then(() => {
-    //       console.log("The user safely log out");
-    //       // alert("Hope to see you again")
-    //     });
-    //   window.location.reload();
-    // }
+    async function signUserOut() {
+      await signOut(auth)
+        .then(() => {
+          console.log("The user safely log out");
+          // alert("Hope to see you again")
+        });
+      window.location.reload();
+    }
 
     window.addEventListener("resize", () => {
       checkScreen();
@@ -157,20 +143,20 @@ export default defineComponent({
 
     return {
       // store states
-      // user: computed(() => store.getters["users/user"]),
-      // profileInitials: computed(() => store.getters["users/profileInitials"]),
-      // profileFirstName: computed(() => store.getters["users/profileFirstName"]),
-      // profileLastName: computed(() => store.getters["users/profileLastName"]),
-      // profileUsername: computed(() => store.getters["users/profileUsername"]),
-      // profileEmail: computed(() => store.getters["users/profileEmail"]),
-      // profileMenu,
-      // profile,
-      // mobile,
-      // mobileNav,
-      // windowWidth, // variables
-      // toggleProfileMenu,
-      // toggleMobileNav,
-      // signOut, // functions
+      user: computed(() => store.getters["users/user"]),
+      profileInitials: computed(() => store.getters["users/profileInitials"]),
+      profileFirstName: computed(() => store.getters["users/profileFirstName"]),
+      profileLastName: computed(() => store.getters["users/profileLastName"]),
+      profileUsername: computed(() => store.getters["users/profileUsername"]),
+      profileEmail: computed(() => store.getters["users/profileEmail"]),
+      profileMenu,
+      profile,
+      mobile,
+      mobileNav,
+      windowWidth,
+      toggleProfileMenu,
+      toggleMobileNav,
+      signUserOut,
     };
   },
   props: {

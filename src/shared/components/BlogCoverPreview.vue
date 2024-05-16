@@ -3,7 +3,7 @@
     <div class="modal-content">
       <!-- TODO: the image should melt into the background -->
       <img
-        src="@/assets/Icons/times-circle-light.svg"
+        src="../../assets/Icons/times-circle-light.svg"
         alt=""
         @click="togglePreview"
         class="icon"
@@ -18,7 +18,6 @@ import { defineComponent } from "vue";
 import { mapState, mapActions } from "vuex";
 export default defineComponent({
   name: "BlogCoverPreview",
-  components: {},
   methods: {
     ...mapActions("posts", ["togglePreview"]),
   },
