@@ -12,35 +12,16 @@
         <div class="upload-file">
           <label for="blog-photo">Upload Cover Photo</label>
           <!-- the "file" type allows uploading photo -->
-          <input
-            type="file"
-            ref="blogPhoto"
-            id="blog-photo"
-            @change="fileChange"
-            accept=".png, .jpg, .jpeg"
-          />
+          <input type="file" ref="blogPhoto" id="blog-photo" @change="fileChange" accept=".png, .jpg, .jpeg" />
           <!-- disable if not having photo -->
-          <button
-            @click="togglePreview"
-            class="preview"
-            :class="{ 'button-inactive': !blogPhotoFileURL }"
-          >
+          <button @click="togglePreview" class="preview" :class="{ 'button-inactive': !blogPhotoFileURL }">
             Preview Photo
           </button>
           <span v-if="coverPhoto">File Chosen: {{ blogCoverPhotoName }}</span>
         </div>
       </div>
       <div class="editor">
-        <!-- TODO: response rendered box under editor when screen size shrinks -->
-        <!-- tool reference: https://github.com/code-farmer-i/vue-markdown-editor -->
-        <!-- Since instantly preview possible, doesn't need preview post function anymore -->
-        <v-md-editor
-          v-model="text"
-          height="600px"
-          :disabled-menus="[]"
-          @upload-image="imageHandler"
-        >
-        </v-md-editor>
+        <MdEditor v-model="text" @upload-image="imageHandler" />
       </div>
       <div class="blog-actions">
         <button @click="uploadBlog">Publish Blog</button>
@@ -60,12 +41,15 @@ import { error } from "console";
 import { collection, doc, getDoc, updateDoc } from "firebase/firestore";
 import { ref as storageRef, uploadBytes } from "firebase/storage";
 import { bucket, firestore } from "../../shared/firebase/firebaseInit";
+import { MdEditor } from 'md-editor-v3';
+import 'md-editor-v3/lib/style.css';
 
 export default defineComponent({
   name: "CreatePost",
   components: {
     BlogCoverPreview,
     Loading,
+    MdEditor,
   },
   setup() {
     // state management

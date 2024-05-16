@@ -58,7 +58,8 @@ export default defineComponent({
           let email = user.email;
           // console.log(`The user email: ${email}`)
           // console.log(`The admin email: ${process.env.VUE_APP_ADMINEMAIL}`)
-          email === process.env.VUE_APP_ADMINEMAIL
+          // @ts-ignore
+          email === import.meta.env.VUE_APP_ADMINEMAIL
             ? (admin.value = true)
             : (admin.value = false);
         } else {

@@ -74,7 +74,7 @@ export default defineComponent({
             this.password
           );
         // create the schema here
-        await addDoc(collection(firestore, `users/${userCredential.user.uid}`), {
+        await addDoc(collection(firestore, `users`), {
           firstName: this.firstName,
           lastName: this.lastName,
           username: this.username,

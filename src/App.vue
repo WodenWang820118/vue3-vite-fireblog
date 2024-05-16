@@ -78,8 +78,7 @@ export default defineComponent({
     // the return here returns the functions that are used in the template
     return {
       profileEmail: computed(() => store.getters["users/profileEmail"]),
-      // postLoaded: computed(() => store.getters["posts/postLoaded"]),
-      postLoaded: true,
+      postLoaded: computed(() => store.getters["posts/postLoaded"]),
       user_login,
       admin, getPost
     };
