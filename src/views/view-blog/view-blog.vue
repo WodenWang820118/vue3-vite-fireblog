@@ -19,8 +19,7 @@
 <script lang="ts">
 import { ref, onMounted, defineComponent } from "vue";
 import { useRoute } from "vue-router";
-import { doc, getDoc } from "firebase/firestore";
-import { firestore } from "../../shared/firebase/firebaseInit";
+import { PostService } from "../../shared/services/post.service";
 
 export default defineComponent({
   name: "view-blog",
@@ -32,16 +31,12 @@ export default defineComponent({
 
     // access router
     const route = useRoute();
+    const postService = new PostService();
 
     async function getRoutedPost() {
-      // console.log(route.params.blogId);
-      const postDocRef = doc(firestore, "blogPosts", `${route.params.blogId}`);
-      const postDocSnap = await getDoc(postDocRef);
-      if (!postDocSnap.exists()) {
-        console.log("No such document!");
-      } else {
-        // console.log("Document data:", postDocSnap.data());
-        currentBlog.value = postDocSnap.data();
+      const post = await postService.getPostById(route.params.blogId);
+      if (post) {
+        currentBlog.value = post;
         markdownSrc.value = currentBlog.value.blogHTML;
       }
     }
