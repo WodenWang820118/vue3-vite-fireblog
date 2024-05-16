@@ -1,5 +1,3 @@
-// import the file only needed, remove redundency
-// the vue app would hook on the firebase backend
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";

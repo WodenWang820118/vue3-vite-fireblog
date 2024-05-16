@@ -1,16 +1,16 @@
 <template>
   <div class="reset-password">
-    <Modal
+    <modal
       v-if="modalActive"
       :modalMessage="modalMessage"
       @close-modal="closeModal"
     />
-    <Loading v-if="loading" />
+    <loading v-if="loading" />
     <div class="form-wrap">
       <form class="reset">
         <p class="login-register">
           Back to
-          <router-link class="router-link" :to="{ name: 'Login' }"
+          <router-link class="router-link" :to="{ name: 'login' }"
             >Login</router-link
           >
         </p>
@@ -35,14 +35,14 @@
 </template>
 
 <script lang="ts">
-import Modal from "../profile/components/Modal.vue";
-import Loading from "../../shared/components/Loading.vue";
+import Modal from "../../shared/components/modal/modal.vue";
+import Loading from "../../shared/components/loading/loading.vue";
 import { auth } from "../../shared/firebase/firebaseInit";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: "ForgotPassword",
+  name: "forgot-password",
   data() {
     return {
       email: "",
@@ -52,8 +52,8 @@ export default defineComponent({
     };
   },
   components: {
-    Modal,
-    Loading,
+    'modal': Modal,
+    'loading' :Loading,
   },
   methods: {
     resetPassword() {

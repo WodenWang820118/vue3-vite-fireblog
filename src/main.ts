@@ -1,6 +1,5 @@
 import { createApp } from "vue";
-import "./style.css";
-import App from "./App.vue";
+import App from "./app.vue";
 import router from "./routes";
 import store from "./store";
 import { VueShowdownPlugin } from "vue-showdown";

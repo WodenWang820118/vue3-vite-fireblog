@@ -86,7 +86,7 @@ const actions = {
     // then commit the mutation to set the post
     const docs = await getDocs(collection(firestore, "blogPosts"));
     if (docs) {
-      console.log("The blog posts are: ", docs);
+      // console.log("The blog posts are: ", docs);
       commit("setPost", docs);
       return;
     }
@@ -130,7 +130,6 @@ const mutations = {
   },
   async setPost(state: State, docs: QuerySnapshot<unknown, DocumentData>) {
     docs.forEach((doc) => {
-      console.log(doc.data());
       const fields = doc.data() as any;
       const data = {
         blogId: fields.blogId,

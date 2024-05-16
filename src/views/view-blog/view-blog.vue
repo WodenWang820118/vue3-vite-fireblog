@@ -5,9 +5,9 @@
       <h4>
         Posted on:
         {{
-        new Date(currentBlog.blogDate).toLocaleString("en-us", {
-        dateStyle: "long",
-        })
+          new Date(currentBlog.blogDate).toLocaleString("en-us", {
+            dateStyle: "long",
+          })
         }}
       </h4>
       <img class="cover-photo" :src="currentBlog.blogCoverPhoto" alt="" />
@@ -23,9 +23,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { firestore } from "../../shared/firebase/firebaseInit";
 
 export default defineComponent({
-  name: "ViewBlog",
-  components: {
-  },
+  name: "view-blog",
   setup() {
     // varailables defined
     const currentBlog = ref();
@@ -35,13 +33,17 @@ export default defineComponent({
     // access router
     const route = useRoute();
 
-
     async function getRoutedPost() {
-      console.log(route.params.blogId);
+      // console.log(route.params.blogId);
       const postDocRef = doc(firestore, "blogPosts", `${route.params.blogId}`);
       const postDocSnap = await getDoc(postDocRef);
-      currentBlog.value = postDocSnap.data();
-      markdownSrc.value = currentBlog.value.blogHTML;
+      if (!postDocSnap.exists()) {
+        console.log("No such document!");
+      } else {
+        // console.log("Document data:", postDocSnap.data());
+        currentBlog.value = postDocSnap.data();
+        markdownSrc.value = currentBlog.value.blogHTML;
+      }
     }
 
     onMounted(() => {
@@ -59,41 +61,4 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
-.post-view {
-  h4 {
-    font-weight: 400;
-    font-size: 14px;
-    margin-bottom: 24px;
-  }
-  min-height: 100%;
-  .container {
-    max-width: 1000px;
-    padding: 60px 25px;
-  }
-  .ql-editor {
-    padding: 0;
-  }
-  h2 {
-    margin-bottom: 16px;
-    font-weight: 300;
-    font-size: 32px;
-  }
-  .cover-photo {
-    width: 100%;
-    margin-bottom: 32px;
-  }
-}
-// overide the default markdown style
-td,
-th {
-  padding: 10px;
-  border: 1px solid #ddd;
-}
-
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-  border: 2px solid #ddd;
-}
-</style>
+<style lang="scss" src="./view-blog.scss"></style>
