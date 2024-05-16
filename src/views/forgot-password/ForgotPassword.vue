@@ -35,8 +35,8 @@
 </template>
 
 <script lang="ts">
-import Modal from "../../shared/components/Modal.vue";
-import Loading from "../../shared/components/Loading.vue";
+import Modal from "../../shared/components/modal/Modal.vue";
+import Loading from "../../shared/components/loading/Loading.vue";
 import { auth } from "../../shared/firebase/firebaseInit";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { defineComponent } from "vue";
