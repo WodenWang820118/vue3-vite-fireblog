@@ -3,10 +3,14 @@
     <div v-show="editPost" class="icons">
       <div @click="editBlog" class="icon">
         <!-- the image has its own container, that's why the it's not centered -->
-        <img class="edit" src="../../assets/Icons/edit-regular.svg" alt="" />
+        <img class="edit" src="../../../assets/icons/edit-regular.svg" alt="" />
       </div>
       <div @click="deletePost" class="icon">
-        <img class="delete" src="../../assets/Icons/trash-regular.svg" alt="" />
+        <img
+          class="delete"
+          src="../../../assets/icons/trash-regular.svg"
+          alt=""
+        />
       </div>
     </div>
     <img class="image" :src="card.blogCoverPhoto" alt="" />
@@ -23,7 +27,7 @@
         :to="{ name: 'view-blog', params: { blogId: card.blogId } }"
       >
         View The Post
-        <img class="arrow" src="../../assets/Icons/arrow-right-light.svg" />
+        <img class="arrow" src="../../../assets/icons/arrow-right-light.svg" />
       </router-link>
     </div>
   </div>

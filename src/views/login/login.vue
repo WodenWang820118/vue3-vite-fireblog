@@ -12,11 +12,19 @@
       <div class="inputs">
         <div class="input">
           <input type="text" placeholder="Email" v-model="email" />
-          <img class="icon" src="../../assets/Icons/envelope-regular.svg" alt="" />
+          <img
+            class="icon"
+            src="../../assets/icons/envelope-regular.svg"
+            alt=""
+          />
         </div>
         <div class="input">
           <input type="password" placeholder="Password" v-model="password" />
-          <img class="icon" src="../../assets/Icons/lock-alt-solid.svg" alt="" />
+          <img
+            class="icon"
+            src="../../assets/icons/lock-alt-solid.svg"
+            alt=""
+          />
         </div>
         <div class="error" v-show="error">{{ errorMsg }}</div>
       </div>
@@ -38,10 +46,10 @@ import { defineComponent, ref } from "vue";
 export default defineComponent({
   name: "login",
   setup() {
-    const email = ref('');
-    const password = ref('');
+    const email = ref("");
+    const password = ref("");
     const error = ref(false);
-    const errorMsg = ref('');
+    const errorMsg = ref("");
 
     return {
       email,

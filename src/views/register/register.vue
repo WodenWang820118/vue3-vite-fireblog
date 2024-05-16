@@ -11,23 +11,43 @@
       <div class="inputs">
         <div class="input">
           <input type="text" placeholder="First Name" v-model="firstName" />
-          <img class="icon" src="../../assets/Icons/user-alt-light.svg" alt="" />
+          <img
+            class="icon"
+            src="../../assets/icons/user-alt-light.svg"
+            alt=""
+          />
         </div>
         <div class="input">
           <input type="text" placeholder="Last Name" v-model="lastName" />
-          <img class="icon" src="../../assets/Icons/user-alt-light.svg" alt="" />
+          <img
+            class="icon"
+            src="../../assets/icons/user-alt-light.svg"
+            alt=""
+          />
         </div>
         <div class="input">
           <input type="text" placeholder="Username" v-model="username" />
-          <img class="icon" src="../../assets/Icons/user-alt-light.svg" alt="" />
+          <img
+            class="icon"
+            src="../../assets/icons/user-alt-light.svg"
+            alt=""
+          />
         </div>
         <div class="input">
           <input type="text" placeholder="Email" v-model="email" />
-          <img class="icon" src="../../assets/Icons/envelope-regular.svg" alt="" />
+          <img
+            class="icon"
+            src="../../assets/icons/envelope-regular.svg"
+            alt=""
+          />
         </div>
         <div class="input">
           <input type="password" placeholder="Password" v-model="password" />
-          <img class="icon" src="../../assets/Icons/lock-alt-solid.svg" alt="" />
+          <img
+            class="icon"
+            src="../../assets/icons/lock-alt-solid.svg"
+            alt=""
+          />
         </div>
         <div class="error" v-show="error">{{ errorMsg }}</div>
       </div>
@@ -68,11 +88,11 @@ export default defineComponent({
       ) {
         this.error = false;
         this.errorMsg = "";
-          const userCredential = await createUserWithEmailAndPassword(
-            auth,
-            this.email,
-            this.password
-          );
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          this.email,
+          this.password
+        );
         // create the schema here
         await addDoc(collection(firestore, `users`), {
           firstName: this.firstName,

@@ -24,7 +24,10 @@
         <h2>Never miss a post. Register for your free account today!</h2>
         <router-link class="router-button" :to="{ name: 'register' }">
           Register For FireBlogs
-          <img class="arrow-light" src="../../assets/Icons/arrow-right-light.svg" />
+          <img
+            class="arrow-light"
+            src="../../assets/icons/arrow-right-light.svg"
+          />
         </router-link>
       </div>
     </div>
@@ -39,8 +42,8 @@ import { ref, computed, defineComponent } from "vue";
 export default defineComponent({
   name: "home",
   components: {
-    'blog-post':BlogPost,
-    'blog-cards':BlogCards,
+    "blog-post": BlogPost,
+    "blog-cards": BlogCards,
   },
   setup() {
     // state management
@@ -59,7 +62,6 @@ export default defineComponent({
         "Weekly blog articles with all things programming including HTML, CSS, JavaScript and more. Register today to never miss a post!",
       welcomeScreen: true,
       photo: "coding",
-
     } as any);
 
     return {
