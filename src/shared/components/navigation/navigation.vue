@@ -42,7 +42,7 @@
                 <router-link class="option" :to="{ name: 'profile' }">
                   <img
                     class="icon"
-                    src="../assets/Icons/user-alt-light.svg"
+                    src="../assets/icons/user-alt-light.svg"
                     alt=""
                   />
                   <p>Profile</p>
@@ -51,7 +51,7 @@
               <div @click="signUserOut" class="option">
                 <img
                   class="icon"
-                  src="../assets/Icons/sign-out-alt-regular.svg"
+                  src="../assets/icons/sign-out-alt-regular.svg"
                   alt=""
                 />
                 <p>Sign Out</p>
@@ -66,7 +66,7 @@
     <img
       @click="toggleMobileNav"
       v-show="mobile"
-      src="../assets/Icons/bars-regular.svg"
+      src="../assets/icons/bars-regular.svg"
       alt=""
       class="menu-icon"
     />

@@ -21,7 +21,7 @@
             <input type="text" placeholder="Email" v-model="email" />
             <img
               class="icon"
-              src="../../assets/Icons/envelope-regular.svg"
+              src="../../assets/icons/envelope-regular.svg"
               alt=""
             />
           </div>
@@ -52,13 +52,13 @@ export default defineComponent({
     };
   },
   components: {
-    'modal': Modal,
-    'loading' :Loading,
+    modal: Modal,
+    loading: Loading,
   },
   methods: {
     resetPassword() {
       this.loading = true;
-        sendPasswordResetEmail(auth, this.email)
+      sendPasswordResetEmail(auth, this.email)
         .then(() => {
           this.modalMessage =
             "If your account exists, you will receive a email";
