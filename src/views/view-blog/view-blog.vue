@@ -5,9 +5,9 @@
       <h4>
         Posted on:
         {{
-        new Date(currentBlog.blogDate).toLocaleString("en-us", {
-        dateStyle: "long",
-        })
+          new Date(currentBlog.blogDate).toLocaleString("en-us", {
+            dateStyle: "long",
+          })
         }}
       </h4>
       <img class="cover-photo" :src="currentBlog.blogCoverPhoto" alt="" />
@@ -23,9 +23,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { firestore } from "../../shared/firebase/firebaseInit";
 
 export default defineComponent({
-  name: "ViewBlog",
-  components: {
-  },
+  name: "view-blog",
   setup() {
     // varailables defined
     const currentBlog = ref();
@@ -36,13 +34,13 @@ export default defineComponent({
     const route = useRoute();
 
     async function getRoutedPost() {
-      console.log(route.params.blogId);
+      // console.log(route.params.blogId);
       const postDocRef = doc(firestore, "blogPosts", `${route.params.blogId}`);
       const postDocSnap = await getDoc(postDocRef);
       if (!postDocSnap.exists()) {
         console.log("No such document!");
       } else {
-        console.log("Document data:", postDocSnap.data());
+        // console.log("Document data:", postDocSnap.data());
         currentBlog.value = postDocSnap.data();
         markdownSrc.value = currentBlog.value.blogHTML;
       }

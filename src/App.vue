@@ -2,16 +2,16 @@
   <div class="app-wrapper">
     <!-- provide the router view only if posts are loaded -->
     <div class="app" v-if="postLoaded">
-      <Navigation :user_login="user_login" :admin="admin" />
+      <navigation :user_login="user_login" :admin="admin" />
       <router-view />
-      <Footer v-if="!user_login" />
+      <footer-vue v-if="!user_login" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Navigation from "./shared/components/navigation/Navigation.vue";
-import Footer from "./shared/components/footer/Footer.vue";
+import Navigation from "./shared/components/navigation/navigation.vue";
+import Footer from "./shared/components/footer/footer.vue";
 import { ref, onMounted, computed, defineComponent, Ref } from "vue";
 import { useStore } from 'vuex'
 import { auth } from "./shared/firebase/firebaseInit";
@@ -19,8 +19,8 @@ import { User } from "firebase/auth";
 export default defineComponent({
   name: "app",
   components: {
-    Navigation,
-    Footer,
+    'navigation': Navigation,
+    'footer-vue': Footer,
   },
   setup() {
     // composition api, useStore with vuex
@@ -60,13 +60,13 @@ export default defineComponent({
           //   ? (admin.value = true)
           //   : (admin.value = false);
           admin.value = true;
-          console.log("The user signed in!");
+          // console.log("The user signed in!");
           user = await mountUser(user);
           getCurrentUser();
           user_login.value = true;
         } else {
           user_login.value = false;
-          console.log("There is no user using right now");
+          // console.log("There is no user using right now");
         }
       });
     }
@@ -85,11 +85,11 @@ export default defineComponent({
   },
   watch: {
     user_login(val) {
-      console.log(`The user_login value is changed to ${val}`);
+      // console.log(`The user_login value is changed to ${val}`);
       this.user_login = val;
     },
     admin(val) {
-      console.log(`The admin value is changed to ${val}`);
+      // console.log(`The admin value is changed to ${val}`);
       this.admin = val;
     },
   },

@@ -18,7 +18,7 @@
         <router-link
           class="link"
           v-else
-          :to="{ name: 'ViewBlog', params: { blogId: post.blogId } }"
+          :to="{ name: 'view-blog', params: { blogId: post.blogId } }"
         >
           View The Post<img
             class="arrow"
@@ -44,7 +44,7 @@ import { useStore } from "vuex";
 import { marked } from "marked";
 
 export default defineComponent({
-  name: "BlogPost",
+  name: "blog-post",
   props: {
     // more clear about props type, easier for type check and validations
     // https://v3.vuejs.org/guide/component-props.html

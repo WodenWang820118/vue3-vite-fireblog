@@ -3,7 +3,7 @@
     <div class="container">
       <div class="left">
         <div class="col-1">
-          <router-link class="header" :to="{ name: 'Home' }"
+          <router-link class="header" :to="{ name: 'home' }"
             >FireBlogs</router-link
           >
           <ul>
@@ -33,16 +33,16 @@
         </div>
         <div class="col-2">
           <ul>
-            <router-link class="link" :to="{ name: 'Home' }">Home</router-link>
-            <router-link class="link" :to="{ name: 'Blogs' }"
+            <router-link class="link" :to="{ name: 'home' }">Home</router-link>
+            <router-link class="link" :to="{ name: 'blogs' }"
               >Blogs</router-link
             >
-            <!-- <router-link v-if="user" class="link" :to="{ name: 'CreatePost' }"
+            <router-link v-if="user" class="link" :to="{ name: 'create-post' }"
               >Create Post</router-link
             >
-            <router-link v-if="!user" class="link" :to="{ name: 'Login' }"
+            <router-link v-if="!user" class="link" :to="{ name: 'login' }"
               >Login In / Register</router-link
-            > -->
+            >
           </ul>
         </div>
       </div>
@@ -58,7 +58,7 @@ import { useStore } from "vuex";
 import { computed, defineComponent } from "vue";
 
 export default defineComponent({
-  name: "FooterVue",
+  name: "footer",
   setup() {
     const store = useStore();
     const user = computed(() => store.getters["users/user"]);

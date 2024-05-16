@@ -1,89 +1,84 @@
 import { createWebHistory, createRouter } from "vue-router";
-import Home from "./views/home/Home.vue";
-import Login from "./views/login/Login.vue";
-import ForgotPassword from "./views/forgot-password/ForgotPassword.vue";
-import Register from "./views/register/Register.vue";
-import Blogs from "./views/blogs/Blogs.vue";
 
 // identify the routes here, the route could have children routes
 const routes = [
   {
     path: "/",
-    name: "Home",
+    name: "home",
     props: true,
-    component: Home,
+    component: () => import("./views/home/home.vue"),
     meta: {
       title: "Home",
     },
   },
   {
     path: "/blogs",
-    name: "Blogs",
+    name: "blogs",
     props: true,
-    component: Blogs,
+    component: () => import("./views/blogs/blogs.vue"),
     meta: {
       title: "Blogs",
     },
   },
   {
     path: "/login",
-    name: "Login",
+    name: "login",
     props: true,
-    component: Login,
+    component: () => import("./views/login/login.vue"),
     meta: {
       title: "Login",
     },
   },
   {
     path: "/register",
-    name: "Register",
+    name: "register",
     props: true,
-    component: Register,
+    component: () => import("./views/register/register.vue"),
     meta: {
       title: "Register",
     },
   },
   {
     path: "/forgot-password",
-    name: "ForgotPassword",
+    name: "forgot-password",
     props: true,
-    component: ForgotPassword,
+    component: () => import("./views/forgot-password/forgot-password.vue"),
     meta: {
       title: "Forgot Password",
     },
   },
   {
     path: "/profile",
-    name: "Profile",
+    name: "profile",
     props: true,
-    component: () => import("./views/profile/Profile.vue"),
+    component: () => import("./views/profile/profile.vue"),
     meta: {
       title: "Profile",
     },
   },
   {
     path: "/create-post",
-    name: "CreatePost",
+    name: "create-post",
     props: true,
-    component: () => import("./views/create-post/CreatePost.vue"),
+    component: () => import("./views/create-post/create-post.vue"),
     meta: {
       title: "Create Post",
     },
   },
   {
     path: "/view-blog/:blogId",
-    name: "ViewBlog",
+    name: "view-blog",
     props: true,
-    component: () => import("./views/view-blog/ViewBlog.vue"),
+    component: () => import("./views/view-blog/view-blog.vue"),
     meta: {
       title: "View Blog",
     },
   },
   {
     path: "/edit-post/:blogId",
-    name: "EditBlog",
+    name: "edit-blog",
     props: true,
-    component: () => import("./views/edit-blog/EditBlog.vue"),
+    component: () => import("./views/edit-blog/edit-blog.vue"),
     meta: {
       title: "Edit Blog Post",
     },

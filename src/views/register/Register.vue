@@ -3,7 +3,7 @@
     <form class="register">
       <p class="login-register">
         Already have an account?
-        <router-link class="router-link" :to="{ name: 'Login' }"
+        <router-link class="router-link" :to="{ name: 'login' }"
           >Login</router-link
         >
       </p>
@@ -45,7 +45,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: "Register",
+  name: "register",
   data() {
     return {
       firstName: "",

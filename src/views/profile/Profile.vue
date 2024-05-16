@@ -58,12 +58,12 @@
 <script lang="ts">
 import { useStore } from "vuex";
 import { ref, computed, defineComponent } from "vue";
-import Modal from "../../shared/components/modal/Modal.vue";
+import Modal from "../../shared/components/modal/modal.vue";
 
 export default defineComponent({
-  name: "Profile",
+  name: "profile",
   components: {
-    Modal,
+    'modal': Modal,
   },
   setup() {
     // variables

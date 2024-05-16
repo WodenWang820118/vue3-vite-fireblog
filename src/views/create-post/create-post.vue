@@ -1,7 +1,7 @@
 <template>
   <div class="create-post">
-    <BlogCoverPreview v-show="blogPhotoPreview" />
-    <Loading v-show="loading" />
+    <blog-cover-preview v-show="blogPhotoPreview" />
+    <loading v-show="loading" />
     <div class="container">
       <div :class="{ invisible: !error }" class="err-message">
         <p><span>Error:</span>{{ errorMsg }}</p>
@@ -18,7 +18,7 @@
         </div>
       </div>
       <div class="editor">
-        <MdEditor :language="'en-US'" v-model="text" @upload-image="imageHandler" />
+        <md-editor :language="'en-US'" v-model="text" @upload-image="imageHandler" />
       </div>
       <div class="blog-actions">
         <button @click="uploadBlog">Publish Blog</button>
@@ -29,8 +29,8 @@
 
 <script lang="ts">
 // components
-import BlogCoverPreview from "../../shared/components/blog-cover-preview/BlogCoverPreview.vue";
-import Loading from "../../shared/components/loading/Loading.vue";
+import BlogCoverPreview from "../../shared/components/blog-cover-preview/blog-cover-preview.vue";
+import Loading from "../../shared/components/loading/loading.vue";
 // vue
 import { ref,  defineComponent, Ref, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -42,11 +42,11 @@ import 'md-editor-v3/lib/style.css';
 import { error } from "console";
 
 export default defineComponent({
-  name: "CreatePost",
+  name: "create-post",
   components: {
-    BlogCoverPreview,
-    Loading,
-    MdEditor,
+    'blog-cover-preview': BlogCoverPreview,
+    'loading': Loading,
+    'md-editor': MdEditor,
   },
   setup() {
     const store = useStore();
