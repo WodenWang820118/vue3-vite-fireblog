@@ -73,7 +73,7 @@ export default defineComponent({
       deletePost: async () => {
         await store.dispatch("posts/deletePostFromDatabase", props.card.blogId);
       },
-      editBlog: async () => editBlog,
+      editBlog: async () => await editBlog(),
     };
   },
 });

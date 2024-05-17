@@ -1,9 +1,13 @@
 <template>
   <div class="blog-card-wrap">
     <div class="blog-cards container">
-      <div class="toggle-edit" v-if="admin">
+      <div class="toggle-edit" v-if="isAdmin">
         <span>Toggle Editing Post</span>
-        <input type="checkbox" autocomplete="off" @change="updEditPost(edit)" />
+        <input
+          type="checkbox"
+          autocomplete="off"
+          @change="updateEditPost(isEdit)"
+        />
       </div>
       <blog-cards
         v-for="(card, index) in blogPosts"
@@ -33,8 +37,8 @@ export default defineComponent({
   setup() {
     const store = useStore();
     const authService = new AuthService();
-    const edit = ref(false);
-    const admin = ref(false);
+    const isEdit = ref(false);
+    const isAdmin = ref(false);
 
     async function checkUserState() {
       const currentUser = await authService.checkUserState();
@@ -42,11 +46,11 @@ export default defineComponent({
         let email = currentUser.email;
         //@ts-ignore
         email === import.meta.env.VITE_APP_ADMINEMAIL
-          ? (admin.value = true)
-          : (admin.value = false);
-        admin.value = true;
+          ? (isAdmin.value = true)
+          : (isAdmin.value = false);
+        isAdmin.value = true;
       } else {
-        admin.value = false;
+        isAdmin.value = false;
       }
     }
 
@@ -61,12 +65,12 @@ export default defineComponent({
     return {
       blogPosts: computed(() => store.getters["posts/blogPosts"]),
       editPost: computed(() => store.getters["posts/editPost"]),
-      edit,
-      updEditPost: async (edit: boolean) =>
-        await store.dispatch("posts/toggleEditPost", !edit),
-      toggleEditPost: async () =>
-        await store.dispatch("posts/toggleEditPost", edit),
-      admin,
+      isEdit,
+      updateEditPost: async (editState: boolean) => {
+        isEdit.value = !editState;
+        return await store.dispatch("posts/toggleEditPost", isEdit.value);
+      },
+      isAdmin,
     };
   },
 });
