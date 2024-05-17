@@ -31,25 +31,10 @@ export default defineComponent({
     "blog-cards": BlogCards,
   },
   setup() {
-    // state management
     const store = useStore();
-    const editPost = computed(() => store.getters["posts/editPost"]);
-
-    // actions
-    async function toggleEditPost(edit: boolean) {
-      await store.dispatch("posts/toggleEditPost", edit);
-    }
-
-    // varibles
-    const edit = ref(false); // for toggle purpose
-    const admin = ref(false);
-
     const authService = new AuthService();
-
-    async function updEditPost(edit: boolean) {
-      edit = !editPost.value;
-      await toggleEditPost(edit);
-    }
+    const edit = ref(false);
+    const admin = ref(false);
 
     async function checkUserState() {
       const currentUser = await authService.checkUserState();
@@ -65,21 +50,22 @@ export default defineComponent({
       }
     }
 
-    onBeforeMount(() => {
-      checkUserState();
+    onBeforeMount(async () => {
+      await checkUserState();
     });
 
-    onBeforeUnmount(() => {
-      // reset the state whenever leave the page
-      toggleEditPost(false);
+    onBeforeUnmount(async () => {
+      await store.dispatch("posts/toggleEditPost", false);
     });
 
     return {
       blogPosts: computed(() => store.getters["posts/blogPosts"]),
-      editPost,
+      editPost: computed(() => store.getters["posts/editPost"]),
       edit,
-      updEditPost,
-      toggleEditPost,
+      updEditPost: async (edit: boolean) =>
+        await store.dispatch("posts/toggleEditPost", !edit),
+      toggleEditPost: async () =>
+        await store.dispatch("posts/toggleEditPost", edit),
       admin,
     };
   },

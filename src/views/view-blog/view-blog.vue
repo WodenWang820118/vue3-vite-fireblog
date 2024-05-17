@@ -20,33 +20,35 @@
 import { ref, onMounted, defineComponent } from "vue";
 import { useRoute } from "vue-router";
 import { PostService } from "../../shared/services/post.service";
+import { useStore } from "vuex";
 
 export default defineComponent({
   name: "view-blog",
   setup() {
-    // varailables defined
     const currentBlog = ref();
     const reload = ref(true);
     const markdownSrc = ref();
-
-    // access router
     const route = useRoute();
+    const store = useStore();
     const postService = new PostService();
 
     async function getRoutedPost() {
-      const post = await postService.getPostById(route.params.blogId);
-      if (post) {
-        currentBlog.value = post;
-        markdownSrc.value = currentBlog.value.blogHTML;
-      }
+      // if there's already a post, use it instead of fetching it from the backend
+      const cachedPost = await store.dispatch(
+        "posts/getCertainPost",
+        route.params.blogId
+      );
+
+      currentBlog.value = cachedPost
+        ? cachedPost
+        : await postService.getPostById(route.params.blogId);
+      markdownSrc.value = currentBlog.value.blogHTML;
     }
 
-    onMounted(() => {
-      getRoutedPost();
+    onMounted(async () => {
+      await getRoutedPost();
     });
 
-    // cannot return the marked during the setup phase
-    // it will return the function string instead of calling
     return {
       reload,
       currentBlog,

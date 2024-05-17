@@ -95,6 +95,14 @@ import { AuthService } from "../../services/auth.service";
 
 export default defineComponent({
   name: "navigation",
+  props: {
+    user_login: {
+      type: Boolean,
+    },
+    admin: {
+      type: Boolean,
+    },
+  },
   setup() {
     // get the store
     const store = useStore();
@@ -127,10 +135,6 @@ export default defineComponent({
       }
     }
 
-    // window.addEventListener("resize", () => {
-    //   checkScreen();
-    // });
-
     onMounted(() => {
       checkScreen();
     });
@@ -152,14 +156,6 @@ export default defineComponent({
       toggleMobileNav,
       signUserOut: authService.signUserOut,
     };
-  },
-  props: {
-    user_login: {
-      type: Boolean,
-    },
-    admin: {
-      type: Boolean,
-    },
   },
 });
 </script>

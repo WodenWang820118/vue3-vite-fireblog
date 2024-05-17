@@ -12,9 +12,8 @@
 <script lang="ts">
 import Navigation from "./shared/components/navigation/navigation.vue";
 import Footer from "./shared/components/footer/footer.vue";
-import { ref, onMounted, computed, defineComponent, Ref } from "vue";
+import { ref, onMounted, computed, defineComponent, onBeforeMount } from "vue";
 import { useStore } from "vuex";
-import { User } from "firebase/auth";
 import { AuthService } from "./shared/services/auth.service";
 export default defineComponent({
   name: "app",
@@ -24,14 +23,15 @@ export default defineComponent({
   },
   setup() {
     const store = useStore();
-    const user_login: Ref<boolean> = ref(false);
-    const admin: Ref<boolean> = ref(false);
+    const user_login = ref(false);
+    const admin = ref(false);
     const authService = new AuthService();
 
     async function checkUserState() {
       const currentUser = await authService.checkUserState();
       if (currentUser) {
         let email = currentUser.email;
+        // TODO: anyone can be admin
         //@ts-ignore
         email === import.meta.env.VITE_APP_ADMINEMAIL
           ? (admin.value = true)
@@ -44,11 +44,14 @@ export default defineComponent({
       }
     }
 
+    onBeforeMount(async () => {
+      await checkUserState();
+    });
+
     onMounted(async () => {
       // check the store before fetching data from the server
       if (!store.getters["posts/postLoaded"])
         await store.dispatch("posts/getPost");
-      if (!store.getters["users/profileEmail"]) await checkUserState();
     });
 
     return {

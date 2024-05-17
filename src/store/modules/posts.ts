@@ -22,7 +22,6 @@ interface State {
 }
 
 const state: State = {
-  // the attributes of a post
   blogHTML: "Write your blog title here...",
   blogTitle: "",
   blogCoverPhotoName: "",

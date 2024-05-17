@@ -58,48 +58,7 @@ export default defineComponent({
     "md-editor": MdEditor,
   },
   setup() {
-    // the router reference
-    const route = useRoute();
-    const router = useRouter();
-
-    // store management
-    const store = useStore();
-
-    // computed properties
     const profileId = computed(() => store.getters["users/profileId"]);
-    const storeComputed = {
-      users: computed(() => store.getters["users/profileId"]),
-      blogHTML: computed(() => store.getters["posts/blogHTML"]),
-      blogCoverPhotoName: computed(
-        () => store.getters["posts/blogCoverPhotoName"]
-      ),
-      blogPhotoFileURL: computed(() => store.getters["posts/blogPhotoFileURL"]),
-      blogPhotoPreview: computed(() => store.getters["posts/blogPhotoPreview"]),
-      blogPosts: computed(() => store.getters["posts/blogPosts"]),
-    };
-
-    // actions
-    async function filenameChange(filename: string) {
-      return await store.dispatch("posts/filenameChange", filename);
-    }
-
-    async function createFileURL(fileName: string) {
-      return await store.dispatch("posts/createFileURL", fileName);
-    }
-
-    async function updateBlogTitle(title: string) {
-      return await store.dispatch("posts/updBlogTitle", title);
-    }
-
-    async function togglePreview() {
-      return await store.dispatch("posts/togglePreview");
-    }
-
-    async function setBlogState(state: any) {
-      return await store.dispatch("posts/setBlogState", state);
-    }
-
-    // variables
     const error = ref(false);
     const errorMsg = ref("");
     const coverPhoto: Ref<File | undefined> = ref(undefined);
@@ -108,8 +67,9 @@ export default defineComponent({
     const loading = ref(false);
     const currentBlog: Ref<DocumentData> = ref({} as any);
     const blogPhoto = ref(undefined as any);
-
-    // services and functions
+    const router = useRouter();
+    const route = useRoute();
+    const store = useStore();
     const postService = new PostService();
 
     async function fileChange() {
@@ -124,8 +84,11 @@ export default defineComponent({
 
       const fileName = coverPhoto.value.name;
       console.log(`The fileName: ${fileName}`);
-      await filenameChange(fileName); // change the state
-      await createFileURL(URL.createObjectURL(coverPhoto.value)); // create the URL
+      await store.dispatch("posts/filenameChange", fileName);
+      await store.dispatch(
+        "posts/createFileURL",
+        URL.createObjectURL(coverPhoto.value)
+      );
     }
 
     async function imageHandler(files: File[]) {
@@ -195,7 +158,14 @@ export default defineComponent({
     });
 
     return {
-      ...storeComputed,
+      users: computed(() => store.getters["users/profileId"]),
+      blogHTML: computed(() => store.getters["posts/blogHTML"]),
+      blogCoverPhotoName: computed(
+        () => store.getters["posts/blogCoverPhotoName"]
+      ),
+      blogPhotoFileURL: computed(() => store.getters["posts/blogPhotoFileURL"]),
+      blogPhotoPreview: computed(() => store.getters["posts/blogPhotoPreview"]),
+      blogPosts: computed(() => store.getters["posts/blogPosts"]),
       error,
       errorMsg,
       blogPhoto,
@@ -206,10 +176,12 @@ export default defineComponent({
       currentBlog,
       fileChange,
       imageHandler,
-      togglePreview,
+      togglePreview: async () => await store.dispatch("posts/togglePreview"),
       uploadBlog,
-      updateBlogTitle,
-      setBlogState,
+      updateBlogTitle: async (title: string) =>
+        await store.dispatch("posts/updBlogTitle", title),
+      setBlogState: async (state: any) =>
+        await store.dispatch("posts/setBlogState", state),
     };
   },
 });

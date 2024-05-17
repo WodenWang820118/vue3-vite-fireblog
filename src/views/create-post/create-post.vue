@@ -3,7 +3,7 @@
     <blog-cover-preview v-show="blogPhotoPreview" />
     <loading v-show="loading" />
     <div class="container">
-      <div :class="{ invisible: !error }" class="err-message">
+      <div :class="{ invisible: !isError }" class="err-message">
         <p><span>Error:</span>{{ errorMsg }}</p>
       </div>
       <div class="blog-info">
@@ -63,47 +63,17 @@ export default defineComponent({
     "md-editor": MdEditor,
   },
   setup() {
-    const store = useStore();
-    const profileId = computed(() => store.getters["users/profileId"]);
-    const storeComputed = {
-      blogHTML: computed(() => store.getters["posts/blogHTML"]),
-      blogCoverPhotoName: computed(
-        () => store.getters["posts/blogCoverPhotoName"]
-      ),
-      blogPhotoFileURL: computed(() => store.getters["posts/blogPhotoFileURL"]),
-      blogPhotoPreview: computed(() => store.getters["posts/blogPhotoPreview"]),
-    };
-
-    async function updateBlogTitle(title: string) {
-      await store.dispatch("posts/updateBlogTitle", title);
-    }
-
-    async function filenameChange(filename: string) {
-      await store.dispatch("posts/filenameChange", filename);
-    }
-
-    async function createFileURL(file: any) {
-      await store.dispatch("posts/createFileURL", file);
-    }
-
-    async function togglePreview() {
-      await store.dispatch("posts/togglePreview");
-    }
-    // services and functions
-    const postService = new PostService();
-
-    // route management
-    const route = useRoute();
-    const router = useRouter();
-
-    // variables
-    const error = ref(false);
+    const isError = ref(false);
     const errorMsg = ref("");
     const coverPhoto: Ref<File | undefined> = ref(undefined);
     const blogTitle = ref("");
     const text = ref("");
     const loading = ref(false);
-    const blogPhoto = ref("" as any); // ref props in the template
+    const blogPhoto = ref("" as any);
+    const profileId = computed(() => store.getters["users/profileId"]);
+    const store = useStore();
+    const postService = new PostService();
+    const router = useRouter();
 
     async function observeFile() {
       coverPhoto.value = await postService.imageCompressionHandler(
@@ -115,8 +85,11 @@ export default defineComponent({
       }
 
       const fileName = coverPhoto.value.name;
-      await filenameChange(fileName); // change the state
-      await createFileURL(URL.createObjectURL(coverPhoto.value)); // create the URL
+      await store.dispatch("posts/filenameChange", fileName);
+      await store.dispatch(
+        "posts/createFileURL",
+        URL.createObjectURL(coverPhoto.value)
+      );
     }
 
     async function imageHandler(files: File[]) {
@@ -126,19 +99,19 @@ export default defineComponent({
     // TODO: try catch with error loading
     async function uploadBlog() {
       if (blogTitle.value.length === 0 && text.value.length === 0) {
-        error.value = true;
+        isError.value = true;
         errorMsg.value = "Please ensure you uploaded a cover photo";
         setTimeout(() => {
-          error.value = false;
+          isError.value = false;
         }, 5000);
         return;
       }
 
       if (!coverPhoto.value) {
-        error.value = true;
+        isError.value = true;
         errorMsg.value = "Please ensure you uploaded a cover photo";
         setTimeout(() => {
-          error.value = false;
+          isError.value = false;
         }, 5000);
         return;
       }
@@ -177,14 +150,20 @@ export default defineComponent({
     }
 
     return {
-      ...storeComputed,
-      updateBlogTitle,
-      togglePreview,
+      blogHTML: computed(() => store.getters["posts/blogHTML"]),
+      blogCoverPhotoName: computed(
+        () => store.getters["posts/blogCoverPhotoName"]
+      ),
+      blogPhotoFileURL: computed(() => store.getters["posts/blogPhotoFileURL"]),
+      blogPhotoPreview: computed(() => store.getters["posts/blogPhotoPreview"]),
+      updateBlogTitle: async () =>
+        await store.dispatch("posts/updateBlogTitle"),
+      togglePreview: async () => await store.dispatch("posts/togglePreview"),
       observeFile,
       imageHandler,
       uploadBlog,
       profileId,
-      error,
+      isError,
       errorMsg,
       coverPhoto,
       blogTitle,
