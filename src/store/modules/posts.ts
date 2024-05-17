@@ -5,6 +5,8 @@ import {
   deleteDoc,
   DocumentData,
   getDocs,
+  limit,
+  query,
   QuerySnapshot,
 } from "firebase/firestore";
 
@@ -83,7 +85,10 @@ const actions = {
   async getPost({ commit }) {
     // get the blog posts from the firestore
     // then commit the mutation to set the post
-    const docs = await getDocs(collection(firestore, "blogPosts"));
+    // TODO: implement pagination
+    // https://firebase.google.com/docs/firestore/query-data/query-cursors
+    const first = query(collection(firestore, "blogPosts"), limit(5));
+    const docs = await getDocs(first);
     if (docs) {
       // console.log("The blog posts are: ", docs);
       commit("setPost", docs);
