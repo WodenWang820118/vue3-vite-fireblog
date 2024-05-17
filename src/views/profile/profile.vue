@@ -63,34 +63,17 @@ import Modal from "../../shared/components/modal/modal.vue";
 export default defineComponent({
   name: "profile",
   components: {
-    'modal': Modal,
+    modal: Modal,
   },
   setup() {
-    // variables
+    const store = useStore();
     const modalMessage = ref("Changes were saved");
     const modalActive = ref(false);
     const wishedFirstName = ref("");
     const wishedLastName = ref("");
     const wishedUsername = ref("");
 
-    // state management
-    const store = useStore();
-
-    const updFirstName = async(firstName: string) => {
-      return await store.dispatch("users/updFirstName", firstName);
-    };
-
-    const updLastName = async(lastName: string) => {
-      return await store.dispatch("users/updLastName", lastName);
-    };
-
-    const updUsername = async(userName: string) => {
-      return await store.dispatch("users/updUsername", userName);
-    };
-
-    // functions
-
-    function updateProfile() {
+    async function updateProfile() {
       if (
         wishedFirstName.value.length == 0 &&
         wishedLastName.value.length == 0 &&
@@ -102,13 +85,13 @@ export default defineComponent({
 
       // update the database value when necessary
       wishedFirstName.value.length > 0
-        ? updFirstName(wishedFirstName.value)
+        ? await store.dispatch("users/updFirstName", wishedFirstName.value)
         : null;
       wishedLastName.value.length > 0
-        ? updLastName(wishedLastName.value)
+        ? await store.dispatch("users/updLastName", wishedLastName.value)
         : null;
       wishedUsername.value.length > 0
-        ? updUsername(wishedUsername.value)
+        ? await store.dispatch("users/updUsername", wishedUsername.value)
         : null;
 
       // reset the input fields
@@ -122,37 +105,19 @@ export default defineComponent({
       modalActive.value = !modalActive.value;
     }
 
-    // wrapped in a object according to the category
-    // to be organized and return the variables, functions, and computed properties
-
-    const storeComputed = {
-      profileInitials: computed(() => store.getters["users/profileInitials"]),
-      profileFirstName: computed(() => store.getters["users/profileFirstName"]),
-      profileLastName: computed(() => store.getters["users/profileLastName"]),
-      profileUsername: computed(() => store.getters["users/profileUsername"]),
-      profileEmail: computed(() => store.getters["users/profileEmail"]),
-    };
-
-    const vars = {
+    return {
       modalMessage,
       modalActive,
       wishedFirstName,
       wishedLastName,
       wishedUsername,
-    };
-
-    const funcs = {
-      updFirstName,
-      updLastName,
-      updUsername,
+      profileInitials: computed(() => store.getters["users/profileInitials"]),
+      profileFirstName: computed(() => store.getters["users/profileFirstName"]),
+      profileLastName: computed(() => store.getters["users/profileLastName"]),
+      profileUsername: computed(() => store.getters["users/profileUsername"]),
+      profileEmail: computed(() => store.getters["users/profileEmail"]),
       updateProfile,
       closeModal,
-    };
-
-    return {
-      ...storeComputed,
-      ...funcs,
-      ...vars,
     };
   },
 });

@@ -88,17 +88,16 @@ export default defineComponent({
       ) {
         isError.value = false;
         errorMsg.value = "";
-        const userCredential = await authService.createUserWithEmailAndPassword(
+        await authService.createUserWithEmailAndPassword(
           email.value,
           password.value
         );
         // create the schema here
-        await addDoc(collection(firestore, `users`), {
-          firstName: firstName,
-          lastName: lastName,
-          username: username,
-          email: email,
-          uid: userCredential.user.uid,
+        await addDoc(collection(firestore, "users"), {
+          firstName: firstName.value,
+          lastName: lastName.value,
+          username: username.value,
+          email: email.value,
         });
         // here changes to $router.push to the named route
         router.push({ name: "home" });

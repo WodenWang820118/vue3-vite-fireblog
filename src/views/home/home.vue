@@ -46,16 +46,7 @@ export default defineComponent({
     "blog-cards": BlogCards,
   },
   setup() {
-    // state management
     const store = useStore();
-
-    const user = computed(() => store.getters["users/user"]);
-    const blogPostsFeed = computed(() => store.getters["posts/blogPostsFeed"]);
-    const blogPostsCards = computed(
-      () => store.getters["posts/blogPostsCards"]
-    );
-
-    // variables
     const welcomeScreen = ref({
       title: "Welcome!",
       blogPost:
@@ -65,9 +56,9 @@ export default defineComponent({
     } as any);
 
     return {
-      user,
-      blogPostsFeed,
-      blogPostsCards,
+      user: computed(() => store.getters["users/user"]),
+      blogPostsFeed: computed(() => store.getters["posts/blogPostsFeed"]),
+      blogPostsCards: computed(() => store.getters["posts/blogPostsCards"]),
       welcomeScreen,
     };
   },

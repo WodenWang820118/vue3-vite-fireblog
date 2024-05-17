@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, defineEmits } from "vue";
 
 export default defineComponent({
   name: "modal",
@@ -18,10 +18,15 @@ export default defineComponent({
       required: true,
     },
   },
-  methods: {
-    closeModal() {
-      this.$emit("close-modal");
-    },
+  setup() {
+    const emit = defineEmits(["close-modal"]);
+
+    function closeModal() {
+      emit("close-modal");
+    }
+    return {
+      closeModal,
+    };
   },
 });
 </script>
