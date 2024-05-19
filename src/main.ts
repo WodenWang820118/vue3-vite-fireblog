@@ -3,8 +3,11 @@ import App from "./app.vue";
 import router from "./routes";
 import { VueShowdownPlugin } from "vue-showdown";
 import { createPinia } from "pinia";
+import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 
 const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
+
 createApp(App)
   .use(pinia)
   .use(router)
