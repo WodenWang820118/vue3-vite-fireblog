@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "browser-image-compression": "^2.0.2",
-    "dompurify": "^3.1.3",
     "dotenv": "^16.4.5",
     "firebase": "^10.12.0",
     "marked": "^12.0.2",
@@ -26,6 +25,7 @@
     "@types/node": "^20.12.12",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/tsconfig": "^0.5.1",
+    "rollup-plugin-visualizer": "^5.12.0",
     "sass": "^1.77.1",
     "typescript": "^5.4.5",
     "vite": "^5.2.0"

@@ -1,4 +1,5 @@
 <template>
+  <navigation :isUserLogin="isUserLogin" :isAdmin="isAdmin" />
   <div class="blog-card-wrap">
     <div class="blog-cards container">
       <div class="toggle-edit" v-if="isAdmin">
@@ -22,66 +23,48 @@
       <button @click="loadMorePosts">Load More Posts</button>
     </div>
   </div>
+  <footer-vue v-if="!isUserLogin" />
 </template>
 
 <script lang="ts">
+import Navigation from "../../shared/components/navigation/navigation.vue";
+import Footer from "../../shared/components/footer/footer.vue";
 import BlogCards from "../../shared/components/blog-cards/blog-cards.vue";
-import {
-  onBeforeUnmount,
-  computed,
-  ref,
-  onBeforeMount,
-  defineComponent,
-} from "vue";
+
+import { onBeforeUnmount, computed, ref, defineComponent } from "vue";
 import { usePostStore } from "../../stores/posts";
-import { auth } from "../../shared/firebase/firebaseInit";
+import { useUserStore } from "../../stores/users";
 
 export default defineComponent({
   name: "blogs",
   components: {
     "blog-cards": BlogCards,
+    navigation: Navigation,
+    "footer-vue": Footer,
   },
   setup() {
-    const store = usePostStore();
+    const postStore = usePostStore();
+    const userStore = useUserStore();
     const isEdit = ref(false);
-    const isAdmin = ref(false);
-
-    function checkUserState() {
-      auth.onAuthStateChanged((currentUser) => {
-        if (currentUser) {
-          let email = currentUser.email;
-          //@ts-ignore
-          email === import.meta.env.VITE_APP_ADMINEMAIL
-            ? (isAdmin.value = true)
-            : (isAdmin.value = false);
-          isAdmin.value = true;
-        } else {
-          isAdmin.value = false;
-        }
-      });
-    }
 
     async function loadMorePosts() {
-      await store.loadMorePosts();
+      await postStore.loadMorePosts();
     }
 
-    onBeforeMount(() => {
-      checkUserState();
-    });
-
     onBeforeUnmount(() => {
-      store.toggleEditPost(false);
+      postStore.toggleEditPost(false);
     });
 
     return {
-      blogPosts: computed(() => store.blogPosts),
-      editPost: computed(() => store.editPost),
+      blogPosts: computed(() => postStore.blogPosts),
+      editPost: computed(() => postStore.editPost),
       isEdit,
       updateEditPost: (editState: boolean) => {
         isEdit.value = !editState;
-        store.toggleEditPost(isEdit.value);
+        postStore.toggleEditPost(isEdit.value);
       },
-      isAdmin,
+      isAdmin: computed(() => userStore.isAdmin),
+      isUserLogin: computed(() => userStore.isUserLogin),
       loadMorePosts,
     };
   },

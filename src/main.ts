@@ -1,17 +1,24 @@
 import { createApp } from "vue";
 import App from "./app.vue";
 import router from "./routes";
-import { VueShowdownPlugin } from "vue-showdown";
 import { createPinia } from "pinia";
-import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 
+const app = createApp(App);
 const pinia = createPinia();
-pinia.use(piniaPluginPersistedstate);
 
-createApp(App)
-  .use(pinia)
-  .use(router)
-  .use(VueShowdownPlugin, {
+async function loadPlugins() {
+  // Dynamically import the VueShowdownPlugin
+  const { VueShowdownPlugin } = await import("vue-showdown");
+
+  // Dynamically import the piniaPluginPersistedstate
+  const { default: piniaPluginPersistedstate } = await import(
+    "pinia-plugin-persistedstate"
+  );
+
+  // Use the plugins
+  pinia.use(piniaPluginPersistedstate);
+
+  app.use(VueShowdownPlugin, {
     flavor: "github",
     options: {
       emoji: true,
@@ -28,5 +35,12 @@ createApp(App)
       requireSpaceBeforeHeadingText: true,
       ghMentions: true,
     },
-  })
-  .mount("#app");
+  });
+}
+
+// Load plugins conditionally or based on some user interaction
+loadPlugins().then(() => {
+  app.use(pinia);
+  app.use(router);
+  app.mount("#app");
+});

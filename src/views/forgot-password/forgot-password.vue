@@ -1,4 +1,5 @@
 <template>
+  <navigation :isUserLogin="false" />
   <div class="reset-password">
     <modal
       v-if="modalActive"
@@ -32,9 +33,12 @@
       <div class="background"></div>
     </div>
   </div>
+  <footer-vue />
 </template>
 
 <script lang="ts">
+import Navigation from "../../shared/components/navigation/navigation.vue";
+import Footer from "../../shared/components/footer/footer.vue";
 import Modal from "../../shared/components/modal/modal.vue";
 import Loading from "../../shared/components/loading/loading.vue";
 import { defineComponent, ref } from "vue";
@@ -45,13 +49,15 @@ export default defineComponent({
   components: {
     modal: Modal,
     loading: Loading,
+    navigation: Navigation,
+    "footer-vue": Footer,
   },
   setup() {
+    const authService = new AuthService();
     const email = ref("");
     const modalActive = ref(false);
     const modalMessage = ref("");
     const loading = ref(false);
-    const authService = new AuthService();
 
     async function resetPassword() {
       try {

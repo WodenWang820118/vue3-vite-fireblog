@@ -1,4 +1,6 @@
 <template>
+  <!-- if user can navigate on the profile page, he/she must be logged in -->
+  <navigation :isUserLogin="true" />
   <div class="profile">
     <modal
       v-if="modalActive"
@@ -37,19 +39,25 @@
       </div>
     </div>
   </div>
+  <footer-vue />
 </template>
 
 <script lang="ts">
+import Navigation from "../../shared/components/navigation/navigation.vue";
+import Footer from "../../shared/components/footer/footer.vue";
+import Modal from "../../shared/components/modal/modal.vue";
 import { useUserStore } from "../../stores/users";
 import { ref, defineComponent, onBeforeMount } from "vue";
-import Modal from "../../shared/components/modal/modal.vue";
-import { auth, firestore } from "../../shared/firebase/firebaseInit";
+import { auth } from "../../shared/firebase/firebase-auth";
+import { firestore } from "../../shared/firebase/firebase-firestore";
 import { doc, updateDoc } from "firebase/firestore";
 
 export default defineComponent({
   name: "profile",
   components: {
     modal: Modal,
+    navigation: Navigation,
+    "footer-vue": Footer,
   },
   setup() {
     const store = useUserStore();
