@@ -2,6 +2,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { firestore } from "../shared/firebase/firebase-firestore";
+import { USERS_COLLECTION } from "../shared/firebase/firebase-config";
 
 export const useUserStore = defineStore(
   "users",
@@ -21,7 +22,7 @@ export const useUserStore = defineStore(
     async function getProfileInfo(userUid: string) {
       if (!userUid) return;
 
-      const docRef = doc(firestore, "users", userUid);
+      const docRef = doc(firestore, USERS_COLLECTION, userUid);
       const document = await getDoc(docRef);
       if (!document.exists()) return;
 
