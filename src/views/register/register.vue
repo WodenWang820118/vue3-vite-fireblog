@@ -60,7 +60,7 @@
 
 <script lang="ts">
 import { firestore } from "../../shared/firebase/firebaseInit";
-import { addDoc, collection } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
 import { AuthService } from "../../shared/services/auth.service";
@@ -88,18 +88,23 @@ export default defineComponent({
       ) {
         isError.value = false;
         errorMsg.value = "";
-        await authService.createUserWithEmailAndPassword(
-          email.value,
-          password.value
-        );
-        // create the schema here
-        await addDoc(collection(firestore, "users"), {
-          firstName: firstName.value,
-          lastName: lastName.value,
-          username: username.value,
-          email: email.value,
-        });
-        // here changes to $router.push to the named route
+        try {
+          const userCredential =
+            await authService.createUserWithEmailAndPassword(
+              email.value,
+              password.value
+            );
+
+          await setDoc(doc(firestore, "users", userCredential.user.uid), {
+            firstName: firstName.value,
+            lastName: lastName.value,
+            username: username.value,
+            email: email.value,
+          });
+        } catch (error) {
+          console.log(error);
+        }
+
         router.push({ name: "home" });
         return;
       }

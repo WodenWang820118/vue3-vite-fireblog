@@ -2,7 +2,6 @@
   <div class="blog-card">
     <div v-show="editPost" class="icons">
       <div @click="editBlog" class="icon">
-        <!-- the image has its own container, that's why the it's not centered -->
         <img class="edit" src="../../../assets/icons/edit-regular.svg" alt="" />
       </div>
       <div @click="deletePost" class="icon">
@@ -34,9 +33,9 @@
 </template>
 
 <script lang="ts">
-import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { computed, defineComponent } from "vue";
+import { usePostStore } from "../../../stores/posts";
 
 export default defineComponent({
   name: "blog-cards",
@@ -44,17 +43,17 @@ export default defineComponent({
     card: {
       type: Object as () => {
         blogId: string;
-        blogTitle: string;
-        blogPost: string;
         blogHTML: string;
         blogCoverPhoto: string;
+        blogTitle: string;
         blogDate: string;
+        blogCoverPhotoName: string;
       },
       required: true,
     },
   },
   setup(props) {
-    const store = useStore();
+    const store = usePostStore();
     const router = useRouter();
 
     async function editBlog() {
@@ -68,10 +67,10 @@ export default defineComponent({
 
     return {
       editPost: computed(() => {
-        return store.getters["posts/editPost"];
+        return store.editPost;
       }),
       deletePost: async () => {
-        await store.dispatch("posts/deletePostFromDatabase", props.card.blogId);
+        await store.deletePostFromDatabase(props.card.blogId);
       },
       editBlog: async () => await editBlog(),
     };

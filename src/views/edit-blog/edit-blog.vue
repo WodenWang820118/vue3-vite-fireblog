@@ -42,7 +42,8 @@
 import BlogCoverPreview from "../../shared/components/blog-cover-preview/blog-cover-preview.vue";
 import Loading from "../../shared/components/loading/loading.vue";
 // vue
-import { useStore } from "vuex";
+import { useUserStore } from "../../stores/users";
+import { usePostStore } from "../../stores/posts";
 import { useRoute, useRouter } from "vue-router";
 import { ref, computed, onMounted, defineComponent, Ref } from "vue";
 // services
@@ -58,7 +59,9 @@ export default defineComponent({
     "md-editor": MdEditor,
   },
   setup() {
-    const profileId = computed(() => store.getters["users/profileId"]);
+    const userStore = useUserStore();
+    const postStore = usePostStore();
+    const profileId = computed(() => userStore.profileId);
     const error = ref(false);
     const errorMsg = ref("");
     const coverPhoto: Ref<File | undefined> = ref(undefined);
@@ -69,7 +72,6 @@ export default defineComponent({
     const blogPhoto = ref(undefined as any);
     const router = useRouter();
     const route = useRoute();
-    const store = useStore();
     const postService = new PostService();
 
     async function fileChange() {
@@ -84,11 +86,8 @@ export default defineComponent({
 
       const fileName = coverPhoto.value.name;
       console.log(`The fileName: ${fileName}`);
-      await store.dispatch("posts/filenameChange", fileName);
-      await store.dispatch(
-        "posts/createFileURL",
-        URL.createObjectURL(coverPhoto.value)
-      );
+      postStore.filenameChange(fileName);
+      postStore.createFileURL(URL.createObjectURL(coverPhoto.value));
     }
 
     async function imageHandler(files: File[]) {
@@ -158,14 +157,12 @@ export default defineComponent({
     });
 
     return {
-      users: computed(() => store.getters["users/profileId"]),
-      blogHTML: computed(() => store.getters["posts/blogHTML"]),
-      blogCoverPhotoName: computed(
-        () => store.getters["posts/blogCoverPhotoName"]
-      ),
-      blogPhotoFileURL: computed(() => store.getters["posts/blogPhotoFileURL"]),
-      blogPhotoPreview: computed(() => store.getters["posts/blogPhotoPreview"]),
-      blogPosts: computed(() => store.getters["posts/blogPosts"]),
+      users: computed(() => userStore.profileId),
+      blogHTML: computed(() => postStore.blogHTML),
+      blogCoverPhotoName: computed(() => postStore.blogCoverPhotoName),
+      blogPhotoFileURL: computed(() => postStore.blogPhotoFileURL),
+      blogPhotoPreview: computed(() => postStore.blogPhotoPreview),
+      blogPosts: computed(() => postStore.blogPosts),
       error,
       errorMsg,
       blogPhoto,
@@ -176,12 +173,9 @@ export default defineComponent({
       currentBlog,
       fileChange,
       imageHandler,
-      togglePreview: async () => await store.dispatch("posts/togglePreview"),
+      togglePreview: () => postStore.togglePreview(),
       uploadBlog,
-      updateBlogTitle: async (title: string) =>
-        await store.dispatch("posts/updBlogTitle", title),
-      setBlogState: async (state: any) =>
-        await store.dispatch("posts/setBlogState", state),
+      updateBlogTitle: (title: string) => postStore.updateBlogTitle(title),
     };
   },
 });

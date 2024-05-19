@@ -20,7 +20,6 @@
 
 <script lang="ts">
 import BlogCards from "../../shared/components/blog-cards/blog-cards.vue";
-import { useStore } from "vuex";
 import {
   onBeforeUnmount,
   computed,
@@ -28,47 +27,49 @@ import {
   onBeforeMount,
   defineComponent,
 } from "vue";
-import { AuthService } from "../../shared/services/auth.service";
+import { usePostStore } from "../../stores/posts";
+import { auth } from "../../shared/firebase/firebaseInit";
+
 export default defineComponent({
   name: "blogs",
   components: {
     "blog-cards": BlogCards,
   },
   setup() {
-    const store = useStore();
-    const authService = new AuthService();
+    const store = usePostStore();
     const isEdit = ref(false);
     const isAdmin = ref(false);
 
-    async function checkUserState() {
-      const currentUser = await authService.checkUserState();
-      if (currentUser) {
-        let email = currentUser.email;
-        //@ts-ignore
-        email === import.meta.env.VITE_APP_ADMINEMAIL
-          ? (isAdmin.value = true)
-          : (isAdmin.value = false);
-        isAdmin.value = true;
-      } else {
-        isAdmin.value = false;
-      }
+    function checkUserState() {
+      auth.onAuthStateChanged((currentUser) => {
+        if (currentUser) {
+          let email = currentUser.email;
+          //@ts-ignore
+          email === import.meta.env.VITE_APP_ADMINEMAIL
+            ? (isAdmin.value = true)
+            : (isAdmin.value = false);
+          isAdmin.value = true;
+        } else {
+          isAdmin.value = false;
+        }
+      });
     }
 
-    onBeforeMount(async () => {
-      await checkUserState();
+    onBeforeMount(() => {
+      checkUserState();
     });
 
-    onBeforeUnmount(async () => {
-      await store.dispatch("posts/toggleEditPost", false);
+    onBeforeUnmount(() => {
+      store.toggleEditPost(false);
     });
 
     return {
-      blogPosts: computed(() => store.getters["posts/blogPosts"]),
-      editPost: computed(() => store.getters["posts/editPost"]),
+      blogPosts: computed(() => store.blogPosts),
+      editPost: computed(() => store.editPost),
       isEdit,
-      updateEditPost: async (editState: boolean) => {
+      updateEditPost: (editState: boolean) => {
         isEdit.value = !editState;
-        return await store.dispatch("posts/toggleEditPost", isEdit.value);
+        store.toggleEditPost(isEdit.value);
       },
       isAdmin,
     };

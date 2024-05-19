@@ -1,4 +1,3 @@
-<!-- the third part of the website for users to login -->
 <template>
   <div class="form-wrap">
     <form class="login">

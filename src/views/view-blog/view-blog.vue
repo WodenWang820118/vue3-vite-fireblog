@@ -17,27 +17,24 @@
 </template>
 
 <script lang="ts">
+import { usePostStore } from "../../stores/posts";
 import { ref, onMounted, defineComponent } from "vue";
 import { useRoute } from "vue-router";
 import { PostService } from "../../shared/services/post.service";
-import { useStore } from "vuex";
 
 export default defineComponent({
   name: "view-blog",
   setup() {
+    const postStore = usePostStore();
+    const route = useRoute();
+    const postService = new PostService();
     const currentBlog = ref();
     const reload = ref(true);
     const markdownSrc = ref();
-    const route = useRoute();
-    const store = useStore();
-    const postService = new PostService();
 
     async function getRoutedPost() {
       // if there's already a post, use it instead of fetching it from the backend
-      const cachedPost = await store.dispatch(
-        "posts/getCertainPost",
-        route.params.blogId
-      );
+      const cachedPost = postStore.getCertainPost(route.params.blogId);
 
       currentBlog.value = cachedPost
         ? cachedPost
