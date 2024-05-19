@@ -51,6 +51,7 @@ import { ref, defineComponent, onBeforeMount } from "vue";
 import { auth } from "../../shared/firebase/firebase-auth";
 import { firestore } from "../../shared/firebase/firebase-firestore";
 import { doc, updateDoc } from "firebase/firestore";
+import { USERS_COLLECTION } from "../../shared/firebase/firebase-config";
 
 export default defineComponent({
   name: "profile",
@@ -73,7 +74,7 @@ export default defineComponent({
       auth.onAuthStateChanged(async (currentUser) => {
         if (currentUser) {
           try {
-            await updateDoc(doc(firestore, "users", currentUser.uid), {
+            await updateDoc(doc(firestore, USERS_COLLECTION, currentUser.uid), {
               firstName: profileFirstName.value,
               lastName: profileLastName.value,
               username: profileUsername.value,

@@ -68,6 +68,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
 import { AuthService } from "../../shared/services/auth.service";
+import { USERS_COLLECTION } from "../../shared/firebase/firebase-config";
 
 export default defineComponent({
   name: "register",
@@ -103,12 +104,15 @@ export default defineComponent({
               password.value
             );
 
-          await setDoc(doc(firestore, "users", userCredential.user.uid), {
-            firstName: firstName.value,
-            lastName: lastName.value,
-            username: username.value,
-            email: email.value,
-          });
+          await setDoc(
+            doc(firestore, USERS_COLLECTION, userCredential.user.uid),
+            {
+              firstName: firstName.value,
+              lastName: lastName.value,
+              username: username.value,
+              email: email.value,
+            }
+          );
         } catch (error) {
           console.log(error);
         }
