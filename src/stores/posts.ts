@@ -8,9 +8,22 @@ import {
   DocumentData,
   getDocs,
   limit,
+  orderBy,
   query,
+  QueryDocumentSnapshot,
   QuerySnapshot,
+  startAfter,
 } from "firebase/firestore";
+
+interface Post {
+  blogId: string;
+  blogHTML: string;
+  blogCoverPhoto: string;
+  blogTitle: string;
+  blogDate: string;
+  blogCoverPhotoName: string;
+  welcomeScreen?: boolean;
+}
 
 export const usePostStore = defineStore(
   "posts",
@@ -22,19 +35,12 @@ export const usePostStore = defineStore(
     const blogPhotoFileURL = ref("");
     const blogPhotoPreview = ref(false);
     const welcomeScreen = ref(false);
-    const blogPosts: Ref<
-      {
-        blogId: string;
-        blogHTML: string;
-        blogCoverPhoto: string;
-        blogTitle: string;
-        blogDate: string;
-        blogCoverPhotoName: string;
-        welcomeScreen?: boolean;
-      }[]
-    > = ref([]);
+    const blogPosts: Ref<Post[]> = ref([]);
     const postLoaded = ref(false);
     const editPost = ref(false);
+    const lastVisibleSnapshot: Ref<
+      QueryDocumentSnapshot<DocumentData, DocumentData>
+    > = ref(null as any);
 
     function blogPostsFeed() {
       return blogPosts.value.slice(0, 2);
@@ -46,19 +52,20 @@ export const usePostStore = defineStore(
 
     // actions
     async function getPost() {
-      // get the blog posts from the firestore
-      // then commit the mutation to set the post
-      // TODO: implement pagination
-      // https://firebase.google.com/docs/firestore/query-data/query-cursors
-
       // if there are already posts, don't fetch again
       // persistent with sessionStorage by using pinia-plugin-persistedstate
       if (blogPosts.value.length > 0) return;
-      const first = query(collection(firestore, "blogPosts"), limit(5));
-      const docs = await getDocs(first);
-      if (docs) {
-        // console.log("The blog posts are: ", docs);
-        await setPost(docs);
+      const first = query(
+        collection(firestore, "blogPosts"),
+        orderBy("blogDate", "desc"),
+        limit(5)
+      );
+      const documentSnapshots = await getDocs(first);
+
+      if (documentSnapshots) {
+        lastVisibleSnapshot.value =
+          documentSnapshots.docs[documentSnapshots.docs.length - 1];
+        setPost(documentSnapshots);
         return;
       }
     }
@@ -69,8 +76,27 @@ export const usePostStore = defineStore(
       deletePost(blogId);
     }
 
+    async function loadMorePosts() {
+      console.log("lastVisibleSnapshot", lastVisibleSnapshot.value);
+      const next = query(
+        collection(firestore, "blogPosts"),
+        orderBy("blogDate", "desc"),
+        startAfter(lastVisibleSnapshot.value),
+        limit(5)
+      );
+
+      const documentSnapshots = await getDocs(next);
+
+      if (documentSnapshots) {
+        lastVisibleSnapshot.value =
+          documentSnapshots.docs[documentSnapshots.docs.length - 1];
+        setPost(documentSnapshots);
+        return;
+      }
+    }
+
     // mutations
-    async function setPost(docs: QuerySnapshot<unknown, DocumentData>) {
+    function setPost(docs: QuerySnapshot<unknown, DocumentData>) {
       docs.forEach((doc) => {
         const fields = doc.data() as any;
         if (fields === undefined || fields === null) {
@@ -91,12 +117,12 @@ export const usePostStore = defineStore(
 
     function deletePost(payload: string) {
       blogPosts.value = blogPosts.value.filter(
-        (post: any) => post.blogId !== payload
+        (post: Post) => post.blogId !== payload
       );
     }
 
     function getCertainPost(blogId: string | string[]) {
-      return blogPosts.value.filter((post: any) => post.blogId == blogId);
+      return blogPosts.value.find((post: Post) => post.blogId == blogId);
     }
 
     function toggleEditPost(payload: boolean) {
@@ -149,6 +175,7 @@ export const usePostStore = defineStore(
       deletePostFromDatabase,
       getCertainPost,
       updateBlogTitle,
+      loadMorePosts,
     };
   },
   {

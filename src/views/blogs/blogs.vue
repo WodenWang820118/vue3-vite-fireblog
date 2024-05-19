@@ -15,6 +15,12 @@
         :key="index"
       />
     </div>
+    <div
+      class="load-more-container"
+      style="display: flex; justify-content: center"
+    >
+      <button @click="loadMorePosts">Load More Posts</button>
+    </div>
   </div>
 </template>
 
@@ -55,6 +61,10 @@ export default defineComponent({
       });
     }
 
+    async function loadMorePosts() {
+      await store.loadMorePosts();
+    }
+
     onBeforeMount(() => {
       checkUserState();
     });
@@ -72,6 +82,7 @@ export default defineComponent({
         store.toggleEditPost(isEdit.value);
       },
       isAdmin,
+      loadMorePosts,
     };
   },
 });
