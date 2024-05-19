@@ -21,7 +21,7 @@ VITE_APP_ADMINEMAIL=<your_email>
 
 2. Create a Firebase project and enable Firestore, Firebase Authentication, and Firebase Storage. Change the setup in the `shared/firebase/firebase-config.ts` file. It includes the document collection name and the storage bucket name.
 
-It should be good to go!
+3. Remove the GTM configuration in the `index.html` file, or change it to your GTM configuration.
 
 ## Development
 
