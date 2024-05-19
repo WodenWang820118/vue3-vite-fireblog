@@ -44,7 +44,7 @@
                 >
                   <img
                     class="icon"
-                    src="../assets/icons/user-alt-light.svg"
+                    src="../../../assets/icons/user-alt-light.svg"
                     alt=""
                   />
                   <p>Profile</p>
@@ -59,7 +59,7 @@
               >
                 <img
                   class="icon"
-                  src="../assets/icons/sign-out-alt-regular.svg"
+                  src="../../../assets/icons/sign-out-alt-regular.svg"
                   alt=""
                 />
                 <p>Sign Out</p>
@@ -72,7 +72,7 @@
     <img
       @click="toggleMobileNav"
       v-show="mobile"
-      src="../assets/icons/bars-regular.svg"
+      src="../../../assets/icons/bars-regular.svg"
       alt=""
       class="menu-icon"
     />

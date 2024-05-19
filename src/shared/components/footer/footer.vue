@@ -10,28 +10,28 @@
             <li>
               <a href="#"
                 ><img
-                  src="../../assets/icons/youtube-brands.svg"
+                  src="../../../assets/icons/youtube-brands.svg"
                   class="svg-icon"
               /></a>
             </li>
             <li>
               <a href="#"
                 ><img
-                  src="../../assets/icons/twitter-brands.svg"
+                  src="../../../assets/icons/twitter-brands.svg"
                   class="svg-icon"
               /></a>
             </li>
             <li>
               <a href="#"
                 ><img
-                  src="../../assets/icons/instagram-brands.svg"
+                  src="../../../assets/icons/instagram-brands.svg"
                   class="svg-icon"
               /></a>
             </li>
             <li>
               <a href="#"
                 ><img
-                  src="../../assets/icons/linkedin-brands.svg"
+                  src="../../../assets/icons/linkedin-brands.svg"
                   class="svg-icon"
               /></a>
             </li>
