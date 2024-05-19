@@ -1,7 +1,7 @@
 import { doc, getDoc } from "firebase/firestore";
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { firestore } from "../shared/firebase/firebaseInit";
+import { firestore } from "../shared/firebase/firebase-firestore";
 
 export const useUserStore = defineStore(
   "users",
@@ -14,6 +14,8 @@ export const useUserStore = defineStore(
     const profileUsername = ref("");
     const profileId = ref("");
     const profileInitials = ref("");
+    const isUserLogin = ref(false);
+    const isAdmin = ref(false);
 
     // actions
     async function getProfileInfo(userUid: string) {
@@ -28,6 +30,7 @@ export const useUserStore = defineStore(
       setFirstName(document.data().firstName);
       setLastName(document.data().lastName);
       setUsername(document.data().username);
+      setUserLogin(true);
     }
 
     // mutations
@@ -60,6 +63,14 @@ export const useUserStore = defineStore(
       profileUsername.value = payload;
     }
 
+    function setUserLogin(payload: boolean) {
+      isUserLogin.value = payload;
+    }
+
+    function setIsAdmin(payload: boolean) {
+      isAdmin.value = payload;
+    }
+
     return {
       user,
       profileEmail,
@@ -68,12 +79,16 @@ export const useUserStore = defineStore(
       profileUsername,
       profileId,
       profileInitials,
+      isUserLogin,
+      isAdmin,
       getProfileInfo,
       setProfileInitials,
       setUser,
       setFirstName,
       setLastName,
       setUsername,
+      setUserLogin,
+      setIsAdmin,
     };
   },
   {

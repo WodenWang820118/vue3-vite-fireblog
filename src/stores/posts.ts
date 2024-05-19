@@ -1,4 +1,4 @@
-import { firestore } from "../shared/firebase/firebaseInit";
+import { firestore } from "../shared/firebase/firebase-firestore";
 import { defineStore } from "pinia";
 import { Ref, ref } from "vue";
 import {

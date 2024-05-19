@@ -1,4 +1,5 @@
 <template>
+  <navigation />
   <div class="form-wrap">
     <form class="login">
       <p class="login-register">
@@ -35,15 +36,22 @@
     </form>
     <div class="background"></div>
   </div>
+  <footer-vue />
 </template>
 
 <script lang="ts">
+import Navigation from "../../shared/components/navigation/navigation.vue";
+import Footer from "../../shared/components/footer/footer.vue";
 import { defineComponent, ref } from "vue";
 import { AuthService } from "../../shared/services/auth.service";
 import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "login",
+  components: {
+    navigation: Navigation,
+    "footer-vue": Footer,
+  },
   setup() {
     const email = ref("");
     const password = ref("");
