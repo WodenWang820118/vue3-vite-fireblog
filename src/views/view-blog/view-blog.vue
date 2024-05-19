@@ -39,6 +39,7 @@ export default defineComponent({
       currentBlog.value = cachedPost
         ? cachedPost
         : await postService.getPostById(route.params.blogId);
+      console.log(currentBlog.value);
       markdownSrc.value = currentBlog.value.blogHTML;
     }
 
