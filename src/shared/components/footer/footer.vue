@@ -60,16 +60,15 @@
 </template>
 
 <script lang="ts">
-import { useStore } from "vuex";
 import { computed, defineComponent } from "vue";
+import { useUserStore } from "../../../stores/users";
 
 export default defineComponent({
   name: "footer-vue",
   setup() {
-    const store = useStore();
-    const user = computed(() => store.getters["users/user"]);
+    const store = useUserStore();
     return {
-      user,
+      user: computed(() => store.user),
     };
   },
 });

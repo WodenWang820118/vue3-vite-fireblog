@@ -1,6 +1,5 @@
 <template>
   <div class="app-wrapper">
-    <!-- provide the router view only if posts are loaded -->
     <div class="app" v-if="postLoaded">
       <navigation :user_login="user_login" :admin="admin" />
       <router-view />
@@ -12,9 +11,11 @@
 <script lang="ts">
 import Navigation from "./shared/components/navigation/navigation.vue";
 import Footer from "./shared/components/footer/footer.vue";
-import { ref, onMounted, computed, defineComponent, onBeforeMount } from "vue";
-import { useStore } from "vuex";
-import { AuthService } from "./shared/services/auth.service";
+import { usePostStore } from "./stores/posts";
+import { useUserStore } from "./stores/users";
+import { ref, computed, defineComponent, onBeforeMount } from "vue";
+import { auth } from "./shared/firebase/firebaseInit";
+
 export default defineComponent({
   name: "app",
   components: {
@@ -22,41 +23,36 @@ export default defineComponent({
     "footer-vue": Footer,
   },
   setup() {
-    const store = useStore();
+    const postStore = usePostStore();
+    const userStore = useUserStore();
     const user_login = ref(false);
     const admin = ref(false);
-    const authService = new AuthService();
 
     async function checkUserState() {
-      const currentUser = await authService.checkUserState();
-      if (currentUser) {
-        let email = currentUser.email;
-        // TODO: anyone can be admin
-        //@ts-ignore
-        email === import.meta.env.VITE_APP_ADMINEMAIL
-          ? (admin.value = true)
-          : (admin.value = false);
-        admin.value = true;
-        await store.dispatch("users/mountUser", currentUser);
-        user_login.value = true;
-      } else {
-        user_login.value = false;
-      }
+      auth.onAuthStateChanged((currentUser) => {
+        if (currentUser) {
+          let email = currentUser.email;
+          //@ts-ignore
+          email === import.meta.env.VITE_APP_ADMINEMAIL
+            ? (admin.value = true)
+            : (admin.value = false);
+          admin.value = true;
+          userStore.setUser(currentUser);
+          user_login.value = true;
+        } else {
+          user_login.value = false;
+        }
+      });
     }
 
     onBeforeMount(async () => {
       await checkUserState();
-    });
-
-    onMounted(async () => {
-      // check the store before fetching data from the server
-      if (!store.getters["posts/postLoaded"])
-        await store.dispatch("posts/getPost");
+      await postStore.getPost();
     });
 
     return {
-      profileEmail: computed(() => store.getters["users/profileEmail"]),
-      postLoaded: computed(() => store.getters["posts/postLoaded"]),
+      profileEmail: computed(() => userStore.profileEmail),
+      postLoaded: computed(() => postStore.postLoaded),
       user_login,
       admin,
     };

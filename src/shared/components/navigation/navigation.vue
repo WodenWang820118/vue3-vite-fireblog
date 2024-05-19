@@ -22,24 +22,26 @@
         </ul>
         <div
           v-if="user"
-          @click="toggleProfileMenu"
           class="profile"
           ref="profile"
+          @click="toggleProfileMenu"
         >
           <span>{{ profileInitials }}</span>
           <div v-show="profileMenu" class="profile-menu">
             <div class="info">
-              <!-- directly access the global store/state/users -->
               <p class="initials">{{ profileInitials }}</p>
               <div class="right">
-                <p>{{ profileFirstName }} {{ profileLastName }}</p>
+                <p>{{ profileFirstName }}</p>
                 <p>{{ profileUsername }}</p>
-                <p>{{ profileEmail }}</p>
               </div>
             </div>
             <div class="options">
               <div class="option">
-                <router-link class="option" :to="{ name: 'profile' }">
+                <router-link
+                  class="option"
+                  :to="{ name: 'profile' }"
+                  @click="toggleProfileMenu"
+                >
                   <img
                     class="icon"
                     src="../assets/icons/user-alt-light.svg"
@@ -48,7 +50,13 @@
                   <p>Profile</p>
                 </router-link>
               </div>
-              <div @click="signUserOut" class="option">
+              <div
+                @click="
+                  signUserOut;
+                  toggleProfileMenu;
+                "
+                class="option"
+              >
                 <img
                   class="icon"
                   src="../assets/icons/sign-out-alt-regular.svg"
@@ -61,8 +69,6 @@
         </div>
       </div>
     </nav>
-    <!-- use file-loader to deal with svg file -->
-    <!-- vue-cli-plugin-svg @see https://www.npmjs.com/package/vue-cli-plugin-svg-vue3 -->
     <img
       @click="toggleMobileNav"
       v-show="mobile"
@@ -89,9 +95,9 @@
 </template>
 
 <script lang="ts">
-import { useStore } from "vuex";
 import { ref, computed, defineComponent, onMounted } from "vue";
 import { AuthService } from "../../services/auth.service";
+import { useUserStore } from "../../../stores/users";
 
 export default defineComponent({
   name: "navigation",
@@ -104,13 +110,10 @@ export default defineComponent({
     },
   },
   setup() {
-    // get the store
-    const store = useStore();
+    const store = useUserStore();
     const authService = new AuthService();
-
-    // the variables for adjusting the responsiiveness
     const profileMenu = ref(false);
-    const mobile = ref(false); // true ? 'show icon' : '' -> can toggle mobileNav
+    const mobile = ref(false);
     const mobileNav = ref(false);
     const windowWidth = ref(window.innerWidth);
     const profile = ref(null);
@@ -129,24 +132,24 @@ export default defineComponent({
       mobileNav.value = !mobileNav.value;
     }
 
-    function toggleProfileMenu(e: MouseEvent) {
-      if (e.target === profile.value) {
-        profileMenu.value = !profileMenu.value;
-      }
+    function toggleProfileMenu(e: Event) {
+      if (e.target === null) return;
+      e.stopImmediatePropagation();
+      profileMenu.value = !profileMenu.value;
     }
 
     onMounted(() => {
       checkScreen();
+      profileMenu.value = false;
     });
 
     return {
-      // store states
-      user: computed(() => store.getters["users/user"]),
-      profileInitials: computed(() => store.getters["users/profileInitials"]),
-      profileFirstName: computed(() => store.getters["users/profileFirstName"]),
-      profileLastName: computed(() => store.getters["users/profileLastName"]),
-      profileUsername: computed(() => store.getters["users/profileUsername"]),
-      profileEmail: computed(() => store.getters["users/profileEmail"]),
+      user: computed(() => store.user),
+      profileInitials: computed(() => store.profileInitials),
+      profileFirstName: computed(() => store.profileFirstName),
+      profileLastName: computed(() => store.profileLastName),
+      profileUsername: computed(() => store.profileUsername),
+      profileEmail: computed(() => store.profileEmail),
       profileMenu,
       profile,
       mobile,
@@ -154,7 +157,7 @@ export default defineComponent({
       windowWidth,
       toggleProfileMenu,
       toggleMobileNav,
-      signUserOut: authService.signUserOut,
+      signUserOut: async () => await authService.signUserOut(),
     };
   },
 });

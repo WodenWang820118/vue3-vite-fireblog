@@ -37,8 +37,10 @@
 <script lang="ts">
 import BlogPost from "./components/blog-post.vue";
 import BlogCards from "../../shared/components/blog-cards/blog-cards.vue";
-import { useStore } from "vuex";
+import { useUserStore } from "../../stores/users";
+import { usePostStore } from "../../stores/posts";
 import { ref, computed, defineComponent } from "vue";
+
 export default defineComponent({
   name: "home",
   components: {
@@ -46,19 +48,23 @@ export default defineComponent({
     "blog-cards": BlogCards,
   },
   setup() {
-    const store = useStore();
+    const userStore = useUserStore();
+    const postStore = usePostStore();
     const welcomeScreen = ref({
-      title: "Welcome!",
-      blogPost:
+      blogId: "welcome",
+      blogHTML:
         "Weekly blog articles with all things programming including HTML, CSS, JavaScript and more. Register today to never miss a post!",
+      blogCoverPhoto: "coding",
+      blogTitle: "Welcome!",
+      blogDate: "2024-05-17",
+      blogCoverPhotoName: "coding",
       welcomeScreen: true,
-      photo: "coding",
-    } as any);
+    });
 
     return {
-      user: computed(() => store.getters["users/user"]),
-      blogPostsFeed: computed(() => store.getters["posts/blogPostsFeed"]),
-      blogPostsCards: computed(() => store.getters["posts/blogPostsCards"]),
+      user: computed(() => userStore.user),
+      blogPostsFeed: computed(() => postStore.blogPostsFeed()),
+      blogPostsCards: computed(() => postStore.blogPostsCards()),
       welcomeScreen,
     };
   },

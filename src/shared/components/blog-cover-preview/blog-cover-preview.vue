@@ -14,15 +14,15 @@
 
 <script lang="ts">
 import { computed, defineComponent } from "vue";
-import { useStore } from "vuex";
+import { usePostStore } from "../../../stores/posts";
 
 export default defineComponent({
   name: "blog-cover-preview",
   setup() {
-    const store = useStore();
+    const store = usePostStore();
     return {
-      togglePreview: async () => store.dispatch("posts/togglePreview"),
-      blogPhotoFileURL: computed(() => store.getters["posts/blogPhotoFileURL"]),
+      togglePreview: () => store.togglePreview(),
+      blogPhotoFileURL: computed(() => store.blogPhotoFileURL),
     };
   },
 });

@@ -6,22 +6,15 @@ import {
   User,
 } from "firebase/auth";
 import { auth } from "../firebase/firebaseInit";
+import { useRouter } from "vue-router";
+
 export class AuthService {
-  checkUserState(): Promise<User> {
-    return new Promise((resolve, reject) => {
-      auth.onAuthStateChanged((user) => {
-        if (user !== null) {
-          resolve(user);
-        } else {
-          reject("No user is signed in");
-        }
-      });
-    });
-  }
+  router = useRouter();
+  constructor() {}
 
   async signUserOut() {
     await signOut(auth);
-    window.location.reload();
+    this.router.push({ name: "home" });
   }
 
   async sendPasswordResetEmail(email: string) {
