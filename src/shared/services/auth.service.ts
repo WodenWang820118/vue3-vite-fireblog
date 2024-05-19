@@ -3,18 +3,15 @@ import {
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
-  User,
 } from "firebase/auth";
 import { auth } from "../firebase/firebaseInit";
-import { useRouter } from "vue-router";
 
 export class AuthService {
-  router = useRouter();
   constructor() {}
 
   async signUserOut() {
     await signOut(auth);
-    this.router.push({ name: "home" });
+    sessionStorage.removeItem("users");
   }
 
   async sendPasswordResetEmail(email: string) {
