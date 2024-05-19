@@ -53,7 +53,7 @@
         </div>
       </div>
       <div class="right">
-        <p>Copyright 2021 All Rights Reserved</p>
+        <p>Copyright 2024 All Rights Reserved</p>
       </div>
     </div>
   </footer>
