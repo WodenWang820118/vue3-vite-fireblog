@@ -5,13 +5,14 @@ import {
   signOut,
 } from "firebase/auth";
 import { auth } from "../firebase/firebase-auth";
+import { USERS_COLLECTION } from "../firebase/firebase-config";
 
 export class AuthService {
   constructor() {}
 
   async signUserOut() {
     await signOut(auth);
-    sessionStorage.removeItem("users");
+    sessionStorage.removeItem(USERS_COLLECTION);
   }
 
   async sendPasswordResetEmail(email: string) {

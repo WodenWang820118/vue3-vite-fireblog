@@ -14,6 +14,7 @@ import {
   QuerySnapshot,
   startAfter,
 } from "firebase/firestore";
+import { BLOG_POSTS_COLLECTION } from "../shared/firebase/firebase-config";
 
 interface Post {
   blogId: string;
@@ -56,7 +57,7 @@ export const usePostStore = defineStore(
       // persistent with sessionStorage by using pinia-plugin-persistedstate
       if (blogPosts.value.length > 0) return;
       const first = query(
-        collection(firestore, "blogPosts"),
+        collection(firestore, BLOG_POSTS_COLLECTION),
         orderBy("blogDate", "desc"),
         limit(5)
       );
@@ -71,7 +72,7 @@ export const usePostStore = defineStore(
     }
 
     async function deletePostFromDatabase(blogId: string) {
-      const document = doc(firestore, "blogPosts", blogId);
+      const document = doc(firestore, BLOG_POSTS_COLLECTION, blogId);
       await deleteDoc(document);
       deletePost(blogId);
     }
@@ -79,7 +80,7 @@ export const usePostStore = defineStore(
     async function loadMorePosts() {
       console.log("lastVisibleSnapshot", lastVisibleSnapshot.value);
       const next = query(
-        collection(firestore, "blogPosts"),
+        collection(firestore, BLOG_POSTS_COLLECTION),
         orderBy("blogDate", "desc"),
         startAfter(lastVisibleSnapshot.value),
         limit(5)

@@ -6,3 +6,8 @@ export const firebaseConfig = {
   messagingSenderId: "954680780309",
   appId: "1:954680780309:web:147f187f86f99dc590901c",
 };
+
+export const BLOG_POST_PHOTOS_BUCKET = "documents/blogPostPhotos";
+export const BLOG_COVER_PHOTOS_BUCKET = "documents/blogCoverPhotos";
+export const BLOG_POSTS_COLLECTION = "blogPosts";
+export const USERS_COLLECTION = "users";

@@ -4,6 +4,11 @@ import { bucket } from "../firebase/firebase-bucket";
 import { firestore } from "../firebase/firebase-firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { Post } from "../interfaces/post.interface";
+import {
+  BLOG_COVER_PHOTOS_BUCKET,
+  BLOG_POSTS_COLLECTION,
+  BLOG_POST_PHOTOS_BUCKET,
+} from "../firebase/firebase-config";
 
 export class PostService {
   async imageCompressionHandler(imageFile: File) {
@@ -38,7 +43,7 @@ export class PostService {
     }
 
     const fileName = contentPhoto.name;
-    const bucketRef = ref(bucket, `documents/blogPostPhotos/${fileName}`);
+    const bucketRef = ref(bucket, `${BLOG_POST_PHOTOS_BUCKET}/${fileName}`);
     await uploadBytes(bucketRef, contentPhoto).then(async (snapshot) => {
       await getDownloadURL(snapshot.ref).then((url) => {
         console.log("The URL back from firebase:" + url);
@@ -48,7 +53,7 @@ export class PostService {
   }
 
   async uploadBlogPost(blogPost: Post) {
-    const newDocRef = doc(collection(firestore, `blogPosts`)); // Auto-generates an ID
+    const newDocRef = doc(collection(firestore, BLOG_POSTS_COLLECTION)); // Auto-generates an ID
     const post = {
       blogId: newDocRef.id,
       blogHTML: blogPost.blogHTML,
@@ -58,12 +63,12 @@ export class PostService {
       profileId: blogPost.profileId,
       blogDate: blogPost.blogDate,
     };
-    await setDoc(doc(firestore, "blogPosts", post.blogId), post);
+    await setDoc(doc(firestore, BLOG_POSTS_COLLECTION, post.blogId), post);
     return post;
   }
 
   async uploadBlogPostPhoto(photoName: string, photo: File) {
-    const bucketRef = ref(bucket, `documents/BlogCoverPhotos/${photoName}`);
+    const bucketRef = ref(bucket, `${BLOG_COVER_PHOTOS_BUCKET}/${photoName}`);
     await uploadBytes(bucketRef, photo).then((snapshot) => {
       console.log("Uploaded a blob or file!", snapshot);
       if (snapshot) {
@@ -72,14 +77,14 @@ export class PostService {
     });
 
     const url = await getDownloadURL(
-      ref(bucket, `documents/BlogCoverPhotos/${photoName}`)
+      ref(bucket, `${BLOG_COVER_PHOTOS_BUCKET}/${photoName}`)
     );
     return url;
   }
 
   async getPostById(blogId: string | string[]) {
     // console.log(route.params.blogId);
-    const postDocRef = doc(firestore, "blogPosts", `${blogId}`);
+    const postDocRef = doc(firestore, BLOG_POSTS_COLLECTION, `${blogId}`);
     const postDocSnap = await getDoc(postDocRef);
     if (!postDocSnap.exists()) {
       console.log("No such document!");
