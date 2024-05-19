@@ -50,13 +50,7 @@
                   <p>Profile</p>
                 </router-link>
               </div>
-              <div
-                @click="
-                  signUserOut;
-                  toggleProfileMenu;
-                "
-                class="option"
-              >
+              <div @click="signUserOut" class="option">
                 <img
                   class="icon"
                   src="../../../assets/icons/sign-out-alt-regular.svg"
@@ -95,9 +89,11 @@
 </template>
 
 <script lang="ts">
-import { ref, computed, defineComponent, onMounted } from "vue";
+import { ref, computed, defineComponent, onMounted, onBeforeMount } from "vue";
 import { AuthService } from "../../services/auth.service";
 import { useUserStore } from "../../../stores/users";
+import { useRouter } from "vue-router";
+import { auth } from "../../firebase/firebaseInit";
 
 export default defineComponent({
   name: "navigation",
@@ -111,12 +107,18 @@ export default defineComponent({
   },
   setup() {
     const store = useUserStore();
+    const router = useRouter();
     const authService = new AuthService();
     const profileMenu = ref(false);
     const mobile = ref(false);
     const mobileNav = ref(false);
     const windowWidth = ref(window.innerWidth);
     const profile = ref(null);
+    const profileInitials = ref("");
+    const profileFirstName = ref("");
+    const profileLastName = ref("");
+    const profileUsername = ref("");
+    const profileEmail = ref("");
 
     function checkScreen() {
       if (windowWidth.value <= 750) {
@@ -135,8 +137,39 @@ export default defineComponent({
     function toggleProfileMenu(e: Event) {
       if (e.target === null) return;
       e.stopImmediatePropagation();
+      console.log(e.target);
       profileMenu.value = !profileMenu.value;
     }
+
+    // TODO: duplicate code; same as in profile.vue
+    function getProfileInfo() {
+      auth.onAuthStateChanged(async (currentUser) => {
+        if (currentUser) {
+          try {
+            await store.getProfileInfo(currentUser.uid);
+            store.setUser(currentUser);
+            store.setProfileInitials();
+            profileInitials.value = store.profileInitials;
+            profileFirstName.value = store.profileFirstName;
+            profileLastName.value = store.profileLastName;
+            profileUsername.value = store.profileUsername;
+            profileEmail.value = store.profileEmail;
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      });
+    }
+
+    async function signUserOut() {
+      await authService.signUserOut();
+      router.push({ name: "home" });
+      window.location.reload(); // manually update UI state
+    }
+
+    onBeforeMount(() => {
+      getProfileInfo();
+    });
 
     onMounted(() => {
       checkScreen();
@@ -145,11 +178,11 @@ export default defineComponent({
 
     return {
       user: computed(() => store.user),
-      profileInitials: computed(() => store.profileInitials),
-      profileFirstName: computed(() => store.profileFirstName),
-      profileLastName: computed(() => store.profileLastName),
-      profileUsername: computed(() => store.profileUsername),
-      profileEmail: computed(() => store.profileEmail),
+      profileInitials,
+      profileFirstName,
+      profileLastName,
+      profileUsername,
+      profileEmail,
       profileMenu,
       profile,
       mobile,
@@ -157,7 +190,7 @@ export default defineComponent({
       windowWidth,
       toggleProfileMenu,
       toggleMobileNav,
-      signUserOut: async () => await authService.signUserOut(),
+      signUserOut: async () => await signUserOut(),
     };
   },
 });
