@@ -15,10 +15,11 @@
     "firebase": "^10.12.0",
     "marked": "^12.0.2",
     "md-editor-v3": "^4.14.1",
+    "pinia": "^2.1.7",
+    "pinia-plugin-persistedstate": "^3.2.1",
     "vue": "^3.4.21",
     "vue-router": "^4.3.2",
-    "vue-showdown": "^4.2.0",
-    "vuex": "^4.1.0"
+    "vue-showdown": "^4.2.0"
   },
   "devDependencies": {
     "@types/dompurify": "^3.0.5",

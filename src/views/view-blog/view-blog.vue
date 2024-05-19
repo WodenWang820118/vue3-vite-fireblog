@@ -17,41 +17,36 @@
 </template>
 
 <script lang="ts">
+import { usePostStore } from "../../stores/posts";
 import { ref, onMounted, defineComponent } from "vue";
 import { useRoute } from "vue-router";
-import { doc, getDoc } from "firebase/firestore";
-import { firestore } from "../../shared/firebase/firebaseInit";
+import { PostService } from "../../shared/services/post.service";
 
 export default defineComponent({
   name: "view-blog",
   setup() {
-    // varailables defined
+    const postStore = usePostStore();
+    const route = useRoute();
+    const postService = new PostService();
     const currentBlog = ref();
     const reload = ref(true);
     const markdownSrc = ref();
 
-    // access router
-    const route = useRoute();
-
     async function getRoutedPost() {
-      // console.log(route.params.blogId);
-      const postDocRef = doc(firestore, "blogPosts", `${route.params.blogId}`);
-      const postDocSnap = await getDoc(postDocRef);
-      if (!postDocSnap.exists()) {
-        console.log("No such document!");
-      } else {
-        // console.log("Document data:", postDocSnap.data());
-        currentBlog.value = postDocSnap.data();
-        markdownSrc.value = currentBlog.value.blogHTML;
-      }
+      // if there's already a post, use it instead of fetching it from the backend
+      const cachedPost = postStore.getCertainPost(route.params.blogId);
+
+      currentBlog.value = cachedPost
+        ? cachedPost
+        : await postService.getPostById(route.params.blogId);
+      console.log(currentBlog.value);
+      markdownSrc.value = currentBlog.value.blogHTML;
     }
 
-    onMounted(() => {
-      getRoutedPost();
+    onMounted(async () => {
+      await getRoutedPost();
     });
 
-    // cannot return the marked during the setup phase
-    // it will return the function string instead of calling
     return {
       reload,
       currentBlog,

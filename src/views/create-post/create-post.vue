@@ -3,22 +3,36 @@
     <blog-cover-preview v-show="blogPhotoPreview" />
     <loading v-show="loading" />
     <div class="container">
-      <div :class="{ invisible: !error }" class="err-message">
+      <div :class="{ invisible: !isError }" class="err-message">
         <p><span>Error:</span>{{ errorMsg }}</p>
       </div>
       <div class="blog-info">
         <input type="text" placeholder="Enter Blog Title" v-model="blogTitle" />
         <div class="upload-file">
           <label for="blog-photo">Upload Cover Photo</label>
-          <input type="file" ref="blogPhoto" id="blog-photo" @change="observeFile" accept=".png, .jpg, .jpeg" />
-          <button @click="togglePreview" class="preview" :class="{ 'button-inactive': !blogPhotoFileURL }">
+          <input
+            type="file"
+            ref="blogPhoto"
+            id="blog-photo"
+            @change="observeFile"
+            accept=".png, .jpg, .jpeg"
+          />
+          <button
+            @click="togglePreview"
+            class="preview"
+            :class="{ 'button-inactive': !blogPhotoFileURL }"
+          >
             Preview Photo
           </button>
           <span v-if="coverPhoto">File Chosen: {{ blogCoverPhotoName }}</span>
         </div>
       </div>
       <div class="editor">
-        <md-editor :language="'en-US'" v-model="text" @upload-image="imageHandler" />
+        <md-editor
+          :language="'en-US'"
+          v-model="text"
+          @upload-image="imageHandler"
+        />
       </div>
       <div class="blog-actions">
         <button @click="uploadBlog">Publish Blog</button>
@@ -32,71 +46,38 @@
 import BlogCoverPreview from "../../shared/components/blog-cover-preview/blog-cover-preview.vue";
 import Loading from "../../shared/components/loading/loading.vue";
 // vue
-import { ref,  defineComponent, Ref, computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { useStore } from "vuex";
+import { ref, defineComponent, Ref, computed } from "vue";
+import { useRouter } from "vue-router";
+import { usePostStore } from "../../stores/posts";
+import { useUserStore } from "../../stores/users";
 // services
-import { MdEditor } from 'md-editor-v3';
-import { EditorService } from "./editor.service";
-import 'md-editor-v3/lib/style.css';
-import { error } from "console";
+import { PostService } from "../../shared/services/post.service";
+import { MdEditor } from "md-editor-v3";
+import "md-editor-v3/lib/style.css";
 
 export default defineComponent({
   name: "create-post",
   components: {
-    'blog-cover-preview': BlogCoverPreview,
-    'loading': Loading,
-    'md-editor': MdEditor,
+    "blog-cover-preview": BlogCoverPreview,
+    loading: Loading,
+    "md-editor": MdEditor,
   },
   setup() {
-    const store = useStore();
-    const profileId = computed(() => store.getters["users/profileId"]);
-    const storeComputed = {
-      blogHTML: computed(() => store.getters["posts/blogHTML"]),
-      blogCoverPhotoName: computed(
-        () => store.getters["posts/blogCoverPhotoName"]
-      ),
-      blogPhotoFileURL: computed(
-        () => store.getters["posts/blogPhotoFileURL"]
-      ),
-      blogPhotoPreview: computed(
-        () => store.getters["posts/blogPhotoPreview"]
-      ),
-    };
-
-    async function updateBlogTitle(title: string) {
-      await store.dispatch("posts/updateBlogTitle", title);
-    }
-
-    async function filenameChange(filename: string) {
-      await store.dispatch("posts/filenameChange", filename);
-    }
-
-    async function createFileURL(file: any) {
-      await store.dispatch("posts/createFileURL", file);
-    }
-
-    async function togglePreview() {
-      await store.dispatch("posts/togglePreview");
-    }
-    // services and functions
-    const editorService = new EditorService();
-
-    // route management
-    const route = useRoute();
-    const router = useRouter();
-
-    // variables
-    const error = ref(false);
+    const postStore = usePostStore();
+    const userStore = useUserStore();
+    const isError = ref(false);
     const errorMsg = ref("");
     const coverPhoto: Ref<File | undefined> = ref(undefined);
     const blogTitle = ref("");
     const text = ref("");
     const loading = ref(false);
-    const blogPhoto = ref("" as any); // ref props in the template
+    const blogPhoto = ref("" as any);
+    const profileId = computed(() => userStore.profileId);
+    const postService = new PostService();
+    const router = useRouter();
 
     async function observeFile() {
-      coverPhoto.value = await editorService.imageCompressionHandler(
+      coverPhoto.value = await postService.imageCompressionHandler(
         blogPhoto.value.files[0]
       );
       console.log(coverPhoto.value);
@@ -104,31 +85,30 @@ export default defineComponent({
         return;
       }
 
-      const fileName = coverPhoto.value.name;
-      await filenameChange(fileName); // change the state
-      await createFileURL(URL.createObjectURL(coverPhoto.value)); // create the URL
+      postStore.filenameChange(coverPhoto.value.name);
+      postStore.createFileURL(URL.createObjectURL(coverPhoto.value));
     }
 
     async function imageHandler(files: File[]) {
-      return await editorService.imageHandler(files);
+      return await postService.imageHandler(files);
     }
 
     // TODO: try catch with error loading
     async function uploadBlog() {
       if (blogTitle.value.length === 0 && text.value.length === 0) {
-        error.value = true;
+        isError.value = true;
         errorMsg.value = "Please ensure you uploaded a cover photo";
         setTimeout(() => {
-          error.value = false;
+          isError.value = false;
         }, 5000);
         return;
       }
 
       if (!coverPhoto.value) {
-        error.value = true;
+        isError.value = true;
         errorMsg.value = "Please ensure you uploaded a cover photo";
         setTimeout(() => {
-          error.value = false;
+          isError.value = false;
         }, 5000);
         return;
       }
@@ -140,40 +120,44 @@ export default defineComponent({
       const uniqueFileName = fileName + timestamp;
 
       // upload the photo to the storage
-      const url = await editorService.uploadBlogPostPhoto(uniqueFileName, coverPhoto.value);
+      const url = await postService.uploadBlogPostPhoto(
+        uniqueFileName,
+        coverPhoto.value
+      );
 
       // upload the blog post document to the firestore
-      const generatedPost = await editorService.uploadBlogPost(
-        {
-          blogId: "",
-          blogHTML: text.value,
-          blogCoverPhoto: url,
-          blogCoverPhotoName: fileName,
-          blogTitle: blogTitle.value,
-          profileId: profileId.value,
-          blogDate: timestamp,
-        }
-      );
+      const generatedPost = await postService.uploadBlogPost({
+        blogId: "",
+        blogHTML: text.value,
+        blogCoverPhoto: url,
+        blogCoverPhotoName: fileName,
+        blogTitle: blogTitle.value,
+        profileId: profileId.value,
+        blogDate: timestamp,
+      });
 
       loading.value = true;
       console.log("[Route to the new post]");
       loading.value = false;
 
       await router.push({
-        name: "ViewBlog",
+        name: "view-blog",
         params: { blogId: generatedPost.blogId },
       });
     }
 
     return {
-      ...storeComputed,
-      updateBlogTitle,
-      togglePreview,
+      blogHTML: computed(() => postStore.blogHTML),
+      blogCoverPhotoName: computed(() => postStore.blogCoverPhotoName),
+      blogPhotoFileURL: computed(() => postStore.blogPhotoFileURL),
+      blogPhotoPreview: computed(() => postStore.blogPhotoPreview),
+      updateBlogTitle: (title: string) => postStore.updBlogTitle(title),
+      togglePreview: () => postStore.togglePreview(),
       observeFile,
       imageHandler,
       uploadBlog,
       profileId,
-      error,
+      isError,
       errorMsg,
       coverPhoto,
       blogTitle,
@@ -181,7 +165,7 @@ export default defineComponent({
       loading,
       blogPhoto,
     };
-  }
+  },
 });
 </script>
 

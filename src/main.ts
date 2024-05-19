@@ -1,11 +1,15 @@
 import { createApp } from "vue";
 import App from "./app.vue";
 import router from "./routes";
-import store from "./store";
 import { VueShowdownPlugin } from "vue-showdown";
+import { createPinia } from "pinia";
+import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
+
+const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
 
 createApp(App)
-  .use(store)
+  .use(pinia)
   .use(router)
   .use(VueShowdownPlugin, {
     flavor: "github",

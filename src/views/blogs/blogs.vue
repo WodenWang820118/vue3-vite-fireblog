@@ -1,72 +1,68 @@
 <template>
   <div class="blog-card-wrap">
     <div class="blog-cards container">
-      <div class="toggle-edit" v-if="admin">
+      <div class="toggle-edit" v-if="isAdmin">
         <span>Toggle Editing Post</span>
-        <input type="checkbox" autocomplete="off" @change="updEditPost(edit)" />
+        <input
+          type="checkbox"
+          autocomplete="off"
+          @change="updateEditPost(isEdit)"
+        />
       </div>
-      <blog-cards v-for="(card, index) in blogPosts" :card="card" :key="index" />
+      <blog-cards
+        v-for="(card, index) in blogPosts"
+        :card="card"
+        :key="index"
+      />
+    </div>
+    <div
+      class="load-more-container"
+      style="display: flex; justify-content: center"
+    >
+      <button @click="loadMorePosts">Load More Posts</button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import BlogCards from "../../shared/components/blog-cards/blog-cards.vue";
-import { useStore } from "vuex";
-import { onBeforeUnmount, computed, ref, onBeforeMount, defineComponent } from "vue";
+import {
+  onBeforeUnmount,
+  computed,
+  ref,
+  onBeforeMount,
+  defineComponent,
+} from "vue";
+import { usePostStore } from "../../stores/posts";
 import { auth } from "../../shared/firebase/firebaseInit";
-import { onAuthStateChanged } from "firebase/auth";
 
 export default defineComponent({
   name: "blogs",
   components: {
-    'blog-cards': BlogCards,
+    "blog-cards": BlogCards,
   },
   setup() {
-    // state management
-    const store = useStore();
-    const editPost = computed(() => store.getters["posts/editPost"]);
+    const store = usePostStore();
+    const isEdit = ref(false);
+    const isAdmin = ref(false);
 
-    // actions
-    const toggleEditPost = (edit: boolean) => {
-      store.dispatch("posts/toggleEditPost", edit);
-    };
-
-    // varibles
-    const edit = ref(false); // for toggle purpose
-    const admin = ref(false);
-
-    /**
-     * According to the state, reassign the local edit boolean to toggle the edit mode
-     */
-    function updEditPost(edit: boolean) {
-      edit = !editPost.value;
-      console.log(edit);
-      toggleEditPost(edit);
-    }
-
-    /**
-     * The function check if the logged in user is admin or not
-     */
     function checkUserState() {
-      // offical recommended way to fire the methods after the user state changes
-      // otherwise, could be null
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          // User is signed in, see docs for a list of available properties
-          // https://firebase.google.com/docs/reference/js/firebase.User
-          let email = user.email;
-          // console.log(`The user email: ${email}`)
-          // console.log(`The admin email: ${process.env.VUE_APP_ADMINEMAIL}`)
-          // @ts-ignore
-          email === import.meta.env.VUE_APP_ADMINEMAIL
-            ? (admin.value = true)
-            : (admin.value = false);
+      auth.onAuthStateChanged((currentUser) => {
+        if (currentUser) {
+          let email = currentUser.email;
+          //@ts-ignore
+          email === import.meta.env.VITE_APP_ADMINEMAIL
+            ? (isAdmin.value = true)
+            : (isAdmin.value = false);
+          isAdmin.value = true;
         } else {
-          admin.value = false;
-          console.log("There is no user using right now");
+          isAdmin.value = false;
         }
       });
+    }
+
+    async function loadMorePosts() {
+      await store.loadMorePosts();
     }
 
     onBeforeMount(() => {
@@ -74,17 +70,19 @@ export default defineComponent({
     });
 
     onBeforeUnmount(() => {
-      // reset the state whenever leave the page
-      toggleEditPost(false);
+      store.toggleEditPost(false);
     });
 
     return {
-      blogPosts: computed(() => store.getters["posts/blogPosts"]),
-      editPost,
-      edit,
-      updEditPost,
-      toggleEditPost,
-      admin,
+      blogPosts: computed(() => store.blogPosts),
+      editPost: computed(() => store.editPost),
+      isEdit,
+      updateEditPost: (editState: boolean) => {
+        isEdit.value = !editState;
+        store.toggleEditPost(isEdit.value);
+      },
+      isAdmin,
+      loadMorePosts,
     };
   },
 });

@@ -18,10 +18,13 @@ export default defineComponent({
       required: true,
     },
   },
-  methods: {
-    closeModal() {
-      this.$emit("close-modal");
-    },
+  setup(props, { emit }) {
+    function closeModal() {
+      emit("close-modal");
+    }
+    return {
+      closeModal,
+    };
   },
 });
 </script>

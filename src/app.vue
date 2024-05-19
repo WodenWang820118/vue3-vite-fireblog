@@ -1,6 +1,5 @@
 <template>
   <div class="app-wrapper">
-    <!-- provide the router view only if posts are loaded -->
     <div class="app" v-if="postLoaded">
       <navigation :user_login="user_login" :admin="admin" />
       <router-view />
@@ -12,75 +11,50 @@
 <script lang="ts">
 import Navigation from "./shared/components/navigation/navigation.vue";
 import Footer from "./shared/components/footer/footer.vue";
-import { ref, onMounted, computed, defineComponent, Ref } from "vue";
-import { useStore } from 'vuex'
+import { usePostStore } from "./stores/posts";
+import { useUserStore } from "./stores/users";
+import { ref, computed, defineComponent, onBeforeMount } from "vue";
 import { auth } from "./shared/firebase/firebaseInit";
-import { User } from "firebase/auth";
+
 export default defineComponent({
   name: "app",
   components: {
-    'navigation': Navigation,
-    'footer-vue': Footer,
+    navigation: Navigation,
+    "footer-vue": Footer,
   },
   setup() {
-    // composition api, useStore with vuex
-    const store = useStore();
-    // composition api, use ref
-    const user_login: Ref<boolean> = ref(false);
-    const admin: Ref<boolean> = ref(false);
-    // dispatched, or committed method from store
-    const getCurrentUser = () => {
-      return store.dispatch("users/getCurrentUser");
-    };
-    const mountUser = (user: User | null) => {
-      if (!user) {
-        return;
-      }
-      return store.dispatch("users/mountUser", user);
-    };
-    const getPost = async () => {
-      return await store.dispatch("posts/getPost");
-    };
-    // the functions used in this view
-    /**
-     * The function check if any user logged in
-     */
-    function checkUserState() {
-      // offical recommended way to fire the methods after the user state changes
-      // otherwise, could be null
-      auth.onAuthStateChanged(async (user) => {
-        if (user) {
-          // User is signed in, see docs for a list of available properties
-          // https://firebase.google.com/docs/reference/js/firebase.User
-          let email = user.email;
-          // console.log(`The user email: ${email}`)
-          // console.log(`The admin email: ${process.env.VUE_APP_ADMINEMAIL}`)
+    const postStore = usePostStore();
+    const userStore = useUserStore();
+    const user_login = ref(false);
+    const admin = ref(false);
+
+    async function checkUserState() {
+      auth.onAuthStateChanged((currentUser) => {
+        if (currentUser) {
+          let email = currentUser.email;
           //@ts-ignore
-          // email === import.meta.env.VITE_APP_ADMINEMAIL
-          //   ? (admin.value = true)
-          //   : (admin.value = false);
+          email === import.meta.env.VITE_APP_ADMINEMAIL
+            ? (admin.value = true)
+            : (admin.value = false);
           admin.value = true;
-          // console.log("The user signed in!");
-          user = await mountUser(user);
-          getCurrentUser();
+          userStore.setUser(currentUser);
           user_login.value = true;
         } else {
           user_login.value = false;
-          // console.log("There is no user using right now");
         }
       });
     }
 
-    onMounted(() => {
-      getPost();
-      checkUserState();
+    onBeforeMount(async () => {
+      await checkUserState();
+      await postStore.getPost();
     });
-    // the return here returns the functions that are used in the template
+
     return {
-      profileEmail: computed(() => store.getters["users/profileEmail"]),
-      postLoaded: computed(() => store.getters["posts/postLoaded"]),
+      profileEmail: computed(() => userStore.profileEmail),
+      postLoaded: computed(() => postStore.postLoaded),
       user_login,
-      admin, getPost
+      admin,
     };
   },
   watch: {

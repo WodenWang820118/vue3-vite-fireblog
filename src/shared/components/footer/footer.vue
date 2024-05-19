@@ -10,28 +10,28 @@
             <li>
               <a href="#"
                 ><img
-                  src="../../assets/icons/youtube-brands.svg"
+                  src="../../../assets/icons/youtube-brands.svg"
                   class="svg-icon"
               /></a>
             </li>
             <li>
               <a href="#"
                 ><img
-                  src="../../assets/icons/twitter-brands.svg"
+                  src="../../../assets/icons/twitter-brands.svg"
                   class="svg-icon"
               /></a>
             </li>
             <li>
               <a href="#"
                 ><img
-                  src="../../assets/icons/instagram-brands.svg"
+                  src="../../../assets/icons/instagram-brands.svg"
                   class="svg-icon"
               /></a>
             </li>
             <li>
               <a href="#"
                 ><img
-                  src="../../assets/icons/linkedin-brands.svg"
+                  src="../../../assets/icons/linkedin-brands.svg"
                   class="svg-icon"
               /></a>
             </li>
@@ -60,16 +60,15 @@
 </template>
 
 <script lang="ts">
-import { useStore } from "vuex";
 import { computed, defineComponent } from "vue";
+import { useUserStore } from "../../../stores/users";
 
 export default defineComponent({
-  name: "footer",
+  name: "footer-vue",
   setup() {
-    const store = useStore();
-    const user = computed(() => store.getters["users/user"]);
+    const store = useUserStore();
     return {
-      user,
+      user: computed(() => store.user),
     };
   },
 });

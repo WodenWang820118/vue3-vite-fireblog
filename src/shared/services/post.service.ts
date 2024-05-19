@@ -1,10 +1,10 @@
 import imageCompression from "browser-image-compression";
 import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { bucket, firestore } from "../../shared/firebase/firebaseInit";
+import { bucket, firestore } from "../firebase/firebaseInit";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { Post } from "../../shared/interfaces/post.interface";
+import { Post } from "../interfaces/post.interface";
 
-export class EditorService {
+export class PostService {
   async imageCompressionHandler(imageFile: File) {
     // options to compress the image
     const options = {
@@ -74,5 +74,16 @@ export class EditorService {
       ref(bucket, `documents/BlogCoverPhotos/${photoName}`)
     );
     return url;
+  }
+
+  async getPostById(blogId: string | string[]) {
+    // console.log(route.params.blogId);
+    const postDocRef = doc(firestore, "blogPosts", `${blogId}`);
+    const postDocSnap = await getDoc(postDocRef);
+    if (!postDocSnap.exists()) {
+      console.log("No such document!");
+    } else {
+      return postDocSnap.data();
+    }
   }
 }

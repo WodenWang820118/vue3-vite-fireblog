@@ -2,7 +2,7 @@
   <div class="modal" ref="modal">
     <div class="modal-content">
       <img
-        src="../../assets/icons/times-circle-light.svg"
+        src="../../../assets/icons/times-circle-light.svg"
         alt=""
         @click="togglePreview"
         class="icon"
@@ -13,15 +13,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { mapState, mapActions } from "vuex";
+import { computed, defineComponent } from "vue";
+import { usePostStore } from "../../../stores/posts";
+
 export default defineComponent({
   name: "blog-cover-preview",
-  methods: {
-    ...mapActions("posts", ["togglePreview"]),
-  },
-  computed: {
-    ...mapState("posts", ["blogPhotoFileURL"]),
+  setup() {
+    const store = usePostStore();
+    return {
+      togglePreview: () => store.togglePreview(),
+      blogPhotoFileURL: computed(() => store.blogPhotoFileURL),
+    };
   },
 });
 </script>

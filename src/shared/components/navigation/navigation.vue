@@ -22,27 +22,29 @@
         </ul>
         <div
           v-if="user"
-          @click="toggleProfileMenu"
           class="profile"
           ref="profile"
+          @click="toggleProfileMenu"
         >
           <span>{{ profileInitials }}</span>
           <div v-show="profileMenu" class="profile-menu">
             <div class="info">
-              <!-- directly access the global store/state/users -->
               <p class="initials">{{ profileInitials }}</p>
               <div class="right">
-                <p>{{ profileFirstName }} {{ profileLastName }}</p>
+                <p>{{ profileFirstName }}</p>
                 <p>{{ profileUsername }}</p>
-                <p>{{ profileEmail }}</p>
               </div>
             </div>
             <div class="options">
               <div class="option">
-                <router-link class="option" :to="{ name: 'profile' }">
+                <router-link
+                  class="option"
+                  :to="{ name: 'profile' }"
+                  @click="toggleProfileMenu"
+                >
                   <img
                     class="icon"
-                    src="../assets/icons/user-alt-light.svg"
+                    src="../../../assets/icons/user-alt-light.svg"
                     alt=""
                   />
                   <p>Profile</p>
@@ -51,7 +53,7 @@
               <div @click="signUserOut" class="option">
                 <img
                   class="icon"
-                  src="../assets/icons/sign-out-alt-regular.svg"
+                  src="../../../assets/icons/sign-out-alt-regular.svg"
                   alt=""
                 />
                 <p>Sign Out</p>
@@ -61,12 +63,10 @@
         </div>
       </div>
     </nav>
-    <!-- use file-loader to deal with svg file -->
-    <!-- vue-cli-plugin-svg @see https://www.npmjs.com/package/vue-cli-plugin-svg-vue3 -->
     <img
       @click="toggleMobileNav"
       v-show="mobile"
-      src="../assets/icons/bars-regular.svg"
+      src="../../../assets/icons/bars-regular.svg"
       alt=""
       class="menu-icon"
     />
@@ -89,23 +89,36 @@
 </template>
 
 <script lang="ts">
-import { useStore } from "vuex";
-import { ref, computed, defineComponent } from "vue";
+import { ref, computed, defineComponent, onMounted, onBeforeMount } from "vue";
+import { AuthService } from "../../services/auth.service";
+import { useUserStore } from "../../../stores/users";
+import { useRouter } from "vue-router";
 import { auth } from "../../firebase/firebaseInit";
-import { signOut } from "firebase/auth";
 
 export default defineComponent({
   name: "navigation",
+  props: {
+    user_login: {
+      type: Boolean,
+    },
+    admin: {
+      type: Boolean,
+    },
+  },
   setup() {
-    // get the store
-    const store = useStore();
-
-    // the variables for adjusting the responsiiveness
+    const store = useUserStore();
+    const router = useRouter();
+    const authService = new AuthService();
     const profileMenu = ref(false);
-    const mobile = ref(false); // true ? 'show icon' : '' -> can toggle mobileNav
+    const mobile = ref(false);
     const mobileNav = ref(false);
     const windowWidth = ref(window.innerWidth);
     const profile = ref(null);
+    const profileInitials = ref("");
+    const profileFirstName = ref("");
+    const profileLastName = ref("");
+    const profileUsername = ref("");
+    const profileEmail = ref("");
 
     function checkScreen() {
       if (windowWidth.value <= 750) {
@@ -121,32 +134,55 @@ export default defineComponent({
       mobileNav.value = !mobileNav.value;
     }
 
-    function toggleProfileMenu(e: MouseEvent) {
-      if (e.target === profile.value) {
-        profileMenu.value = !profileMenu.value;
-      }
+    function toggleProfileMenu(e: Event) {
+      if (e.target === null) return;
+      e.stopImmediatePropagation();
+      console.log(e.target);
+      profileMenu.value = !profileMenu.value;
+    }
+
+    // TODO: duplicate code; same as in profile.vue
+    function getProfileInfo() {
+      auth.onAuthStateChanged(async (currentUser) => {
+        if (currentUser) {
+          try {
+            await store.getProfileInfo(currentUser.uid);
+            store.setUser(currentUser);
+            store.setProfileInitials();
+            profileInitials.value = store.profileInitials;
+            profileFirstName.value = store.profileFirstName;
+            profileLastName.value = store.profileLastName;
+            profileUsername.value = store.profileUsername;
+            profileEmail.value = store.profileEmail;
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      });
     }
 
     async function signUserOut() {
-      await signOut(auth).then(() => {
-        // console.log("The user safely log out");
-        // alert("Hope to see you again")
-      });
-      window.location.reload();
+      await authService.signUserOut();
+      router.push({ name: "home" });
+      window.location.reload(); // manually update UI state
     }
 
-    window.addEventListener("resize", () => {
+    onBeforeMount(() => {
+      getProfileInfo();
+    });
+
+    onMounted(() => {
       checkScreen();
+      profileMenu.value = false;
     });
 
     return {
-      // store states
-      user: computed(() => store.getters["users/user"]),
-      profileInitials: computed(() => store.getters["users/profileInitials"]),
-      profileFirstName: computed(() => store.getters["users/profileFirstName"]),
-      profileLastName: computed(() => store.getters["users/profileLastName"]),
-      profileUsername: computed(() => store.getters["users/profileUsername"]),
-      profileEmail: computed(() => store.getters["users/profileEmail"]),
+      user: computed(() => store.user),
+      profileInitials,
+      profileFirstName,
+      profileLastName,
+      profileUsername,
+      profileEmail,
       profileMenu,
       profile,
       mobile,
@@ -154,16 +190,8 @@ export default defineComponent({
       windowWidth,
       toggleProfileMenu,
       toggleMobileNav,
-      signUserOut,
+      signUserOut: async () => await signUserOut(),
     };
-  },
-  props: {
-    user_login: {
-      type: Boolean,
-    },
-    admin: {
-      type: Boolean,
-    },
   },
 });
 </script>
