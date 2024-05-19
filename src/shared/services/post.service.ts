@@ -1,6 +1,7 @@
 import imageCompression from "browser-image-compression";
-import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { bucket, firestore } from "../firebase/firebaseInit";
+import { collection, doc, getDoc, setDoc } from "firebase/firestore";
+import { bucket } from "../firebase/firebase-bucket";
+import { firestore } from "../firebase/firebase-firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { Post } from "../interfaces/post.interface";
 

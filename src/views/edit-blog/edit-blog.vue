@@ -1,4 +1,5 @@
 <template>
+  <navigation :isUserLogin="isUserLogin" :isAdmin="isAdmin" />
   <div class="create-post">
     <blog-cover-preview v-show="blogPhotoPreview" />
     <loading v-show="loading" />
@@ -39,24 +40,43 @@
 
 <script lang="ts">
 // components
+import Navigation from "../../shared/components/navigation/navigation.vue";
 import BlogCoverPreview from "../../shared/components/blog-cover-preview/blog-cover-preview.vue";
 import Loading from "../../shared/components/loading/loading.vue";
 // vue
 import { useUserStore } from "../../stores/users";
 import { usePostStore } from "../../stores/posts";
 import { useRoute, useRouter } from "vue-router";
-import { ref, computed, onMounted, defineComponent, Ref } from "vue";
+import {
+  ref,
+  computed,
+  onMounted,
+  defineComponent,
+  Ref,
+  defineAsyncComponent,
+} from "vue";
 // services
 import { DocumentData } from "firebase/firestore";
 import { PostService } from "../../shared/services/post.service";
-import { MdEditor } from "md-editor-v3";
-import "md-editor-v3/lib/style.css";
+
+const AsyncMdEditor = defineAsyncComponent(async () => {
+  // Dynamically import the component and the CSS
+  const [component] = await Promise.all([
+    import("md-editor-v3"),
+    import("md-editor-v3/lib/style.css").catch(() => {
+      console.error("Failed to import the CSS file.");
+    }),
+  ]);
+  return component.MdEditor;
+});
+
 export default defineComponent({
   name: "edit-blog",
   components: {
     "blog-cover-preview": BlogCoverPreview,
     loading: Loading,
-    "md-editor": MdEditor,
+    "md-editor": AsyncMdEditor,
+    navigation: Navigation,
   },
   setup() {
     const userStore = useUserStore();
@@ -163,6 +183,8 @@ export default defineComponent({
       blogPhotoFileURL: computed(() => postStore.blogPhotoFileURL),
       blogPhotoPreview: computed(() => postStore.blogPhotoPreview),
       blogPosts: computed(() => postStore.blogPosts),
+      isUserLogin: computed(() => userStore.isUserLogin),
+      isAdmin: computed(() => userStore.isAdmin),
       error,
       errorMsg,
       blogPhoto,

@@ -11,12 +11,12 @@
           <router-link class="link" :to="{ name: 'home' }">Home</router-link>
           <router-link class="link" :to="{ name: 'blogs' }">Blogs</router-link>
           <router-link
-            v-if="user_login && admin"
+            v-if="isUserLogin && isAdmin"
             class="link"
             :to="{ name: 'create-post' }"
             >Create Post
           </router-link>
-          <router-link v-if="!user_login" class="link" :to="{ name: 'login' }"
+          <router-link v-if="!isUserLogin" class="link" :to="{ name: 'login' }"
             >Login/Register
           </router-link>
         </ul>
@@ -75,12 +75,12 @@
         <router-link class="link" :to="{ name: 'home' }">Home</router-link>
         <router-link class="link" :to="{ name: 'blogs' }">Blogs</router-link>
         <router-link
-          v-if="user_login && admin"
+          v-if="isUserLogin && isAdmin"
           class="link"
           :to="{ name: 'create-post' }"
           >Create Post</router-link
         >
-        <router-link v-if="!user_login" class="link" :to="{ name: 'login' }"
+        <router-link v-if="!isUserLogin" class="link" :to="{ name: 'login' }"
           >Login/Register</router-link
         >
       </ul>
@@ -93,15 +93,15 @@ import { ref, computed, defineComponent, onMounted, onBeforeMount } from "vue";
 import { AuthService } from "../../services/auth.service";
 import { useUserStore } from "../../../stores/users";
 import { useRouter } from "vue-router";
-import { auth } from "../../firebase/firebaseInit";
+import { auth } from "../../firebase/firebase-auth";
 
 export default defineComponent({
   name: "navigation",
   props: {
-    user_login: {
+    isUserLogin: {
       type: Boolean,
     },
-    admin: {
+    isAdmin: {
       type: Boolean,
     },
   },

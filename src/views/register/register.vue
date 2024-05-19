@@ -1,4 +1,5 @@
 <template>
+  <navigation />
   <div class="form-wrap">
     <form class="register">
       <p class="login-register">
@@ -56,10 +57,13 @@
     </form>
     <div class="background"></div>
   </div>
+  <footer-vue />
 </template>
 
 <script lang="ts">
-import { firestore } from "../../shared/firebase/firebaseInit";
+import Navigation from "../../shared/components/navigation/navigation.vue";
+import Footer from "../../shared/components/footer/footer.vue";
+import { firestore } from "../../shared/firebase/firebase-firestore";
 import { doc, setDoc } from "firebase/firestore";
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
@@ -67,6 +71,10 @@ import { AuthService } from "../../shared/services/auth.service";
 
 export default defineComponent({
   name: "register",
+  components: {
+    navigation: Navigation,
+    "footer-vue": Footer,
+  },
   setup() {
     const firstName = ref("");
     const lastName = ref("");

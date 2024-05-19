@@ -4,7 +4,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { auth } from "../firebase/firebaseInit";
+import { auth } from "../firebase/firebase-auth";
 
 export class AuthService {
   constructor() {}
