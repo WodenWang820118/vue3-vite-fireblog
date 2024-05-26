@@ -43,6 +43,9 @@ header {
 
         .link {
           margin-right: 32px;
+          @media screen and (max-width: 768px) {
+            margin-right: 16px;
+          }
         }
 
         .link:last-child {
